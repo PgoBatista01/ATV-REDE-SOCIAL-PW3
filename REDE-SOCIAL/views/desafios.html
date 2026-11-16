@@ -1,0 +1,100 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Desafios | Santuário Social{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="text-center mb-5">
+        <h1>Desafios do Santuário</h1>
+
+        <p>
+            Teste seus conhecimentos sobre Cavaleiros do Zodíaco
+            e descubra o poder do seu Cosmo!
+        </p>
+    </div>
+
+    <div class="cosmo-card mb-4">
+        <h2>Prove seu conhecimento!</h2>
+        <p>
+            Responda às perguntas e acumule pontos para demonstrar
+            que você conhece o universo de Atena.
+        </p>
+    </div>
+
+    {% if resultado is defined and resultado is not none %}
+
+        <div class="alert alert-success text-center">
+            <h3>Desafio concluído!</h3>
+
+            <p>
+                Você acertou {{ resultado.acertos }}
+                de {{ resultado.total }} perguntas.
+            </p>
+
+            <h4>Pontuação: {{ resultado.pontuacao }} pontos</h4>
+        </div>
+
+    {% endif %}
+
+    <form action="{{ url_for('desafios.desafios') }}" method="POST">
+
+        {% for pergunta in perguntas %}
+
+            <div class="desafio-card">
+
+                <h3>
+                    Pergunta {{ loop.index }}
+                </h3>
+
+                <p>
+                    {{ pergunta.pergunta }}
+                </p>
+
+                <div class="alternativas">
+
+                    {% for alternativa in pergunta.opcoes %}
+
+                        <div class="form-check mb-2">
+
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                name="resposta_{{ pergunta.id }}"
+                                id="pergunta_{{ pergunta.id }}_{{ loop.index }}"
+                                value="{{ alternativa }}"
+                                required
+                            >
+
+                            <label
+                                class="form-check-label"
+                                for="pergunta_{{ pergunta.id }}_{{ loop.index }}"
+                            >
+                                {{ alternativa }}
+                            </label>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+        <div class="text-center mt-4 mb-5">
+
+            <button type="submit" class="btn btn-primary btn-lg">
+                Finalizar desafio
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock content %}

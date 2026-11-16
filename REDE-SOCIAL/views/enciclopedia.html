@@ -1,0 +1,136 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Enciclopédia | Santuário Social{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="text-center mb-5">
+        <h1>Enciclopédia do Santuário</h1>
+        <p>
+            Explore o universo de Cavaleiros do Zodíaco,
+            conheça seus personagens e descubra suas histórias.
+        </p>
+    </div>
+
+    <!-- CAVALEIROS DE BRONZE -->
+
+    <h2 class="mb-4">Cavaleiros de Bronze</h2>
+
+    <div class="row g-4 mb-5">
+
+        {% set bronze = [
+            ('Seiya de Pégaso', 'Pégaso', 'Bronze', 'Meteoro de Pégaso', 'Um dos principais protagonistas da história, conhecido por sua determinação e coragem.', 'seiya.png'),
+            ('Shiryu de Dragão', 'Dragão', 'Bronze', 'Cólera do Dragão', 'Um cavaleiro conhecido por sua sabedoria, disciplina e espírito de justiça.', 'shiryu.png'),
+            ('Hyoga de Cisne', 'Cisne', 'Bronze', 'Pó de Diamante', 'Um cavaleiro que utiliza técnicas relacionadas ao gelo e às baixas temperaturas.', 'hyoga.png'),
+            ('Shun de Andrômeda', 'Andrômeda', 'Bronze', 'Corrente de Andrômeda', 'Um cavaleiro gentil que utiliza correntes especiais em suas batalhas.', 'shun.png'),
+            ('Ikki de Fênix', 'Fênix', 'Bronze', 'Ave Fênix', 'Um cavaleiro de personalidade forte, conhecido por seu poder e resistência.', 'ikki.png')
+        ] %}
+
+        {% for nome, constelacao, armadura, tecnica, descricao, imagem in bronze %}
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card cavaleiro-card h-100">
+
+                <img
+                    src="{{ url_for('static', filename='imgs/' + imagem) }}"
+                    class="card-img-top"
+                    alt="{{ nome }}"
+                >
+
+                <div class="card-body">
+                    <h3>{{ nome }}</h3>
+
+                    <p>{{ descricao }}</p>
+
+                    <p><strong>Constelação:</strong> {{ constelacao }}</p>
+                    <p><strong>Armadura:</strong> {{ armadura }}</p>
+                    <p><strong>Técnica:</strong> {{ tecnica }}</p>
+                </div>
+
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- CAVALEIROS DE OURO -->
+
+    <h2 class="mb-4">Cavaleiros de Ouro</h2>
+
+    <div class="row g-4 mb-5">
+
+        {% set dourados = [
+            ('Mu de Áries', 'Áries', 'mu.png'),
+            ('Aldebaran de Touro', 'Touro', 'aldebaran.png'),
+            ('Saga de Gêmeos', 'Gêmeos', 'saga.png'),
+            ('Máscara da Morte de Câncer', 'Câncer', 'mascara-da-morte.png'),
+            ('Aiolia de Leão', 'Leão', 'aiolia.png'),
+            ('Shaka de Virgem', 'Virgem', 'shaka.png'),
+            ('Dohko de Libra', 'Libra', 'dohko.png'),
+            ('Milo de Escorpião', 'Escorpião', 'milo.png'),
+            ('Aiolos de Sagitário', 'Sagitário', 'aiolos.png'),
+            ('Shura de Capricórnio', 'Capricórnio', 'shura.png'),
+            ('Camus de Aquário', 'Aquário', 'camus.png'),
+            ('Afrodite de Peixes', 'Peixes', 'afrodite.png')
+        ] %}
+
+        {% for nome, constelacao, imagem in dourados %}
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card cavaleiro-card h-100">
+
+                <img
+                    src="{{ url_for('static', filename='imgs/' + imagem) }}"
+                    class="card-img-top"
+                    alt="{{ nome }}"
+                >
+
+                <div class="card-body text-center">
+                    <h3>{{ nome }}</h3>
+
+                    <p>
+                        Guardião da Casa de {{ constelacao }}.
+                    </p>
+
+                    <p>
+                        <strong>Constelação:</strong>
+                        {{ constelacao }}
+                    </p>
+
+                    <p>
+                        <strong>Armadura:</strong>
+                        Ouro
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- INFORMAÇÕES -->
+
+    <div class="cosmo-card text-center mt-4">
+
+        <h2>Conhecimento é poder</h2>
+
+        <p>
+            Continue explorando o Santuário, conhecendo os cavaleiros
+            e descobrindo os mistérios das doze constelações.
+        </p>
+
+        <a href="{{ url_for('casas') }}" class="btn btn-primary mt-2">
+            Conhecer as Doze Casas
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock content %}

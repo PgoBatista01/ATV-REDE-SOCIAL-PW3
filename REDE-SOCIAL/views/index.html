@@ -1,0 +1,188 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Início | Santuário Social{% endblock %}
+
+{% block content %}
+
+<section class="container text-center">
+
+    <!-- APRESENTAÇÃO -->
+
+    <div class="py-5">
+
+        <h1>Bem-vindo ao Santuário Social!</h1>
+
+        <h3>A comunidade dos Cavaleiros de Atena</h3>
+
+        <hr>
+
+        <p>
+            Explore o universo de Cavaleiros do Zodíaco,
+            compartilhe suas experiências, conheça outros fãs
+            e descubra os mistérios do Santuário.
+        </p>
+
+        <img
+            src="{{ url_for('static', filename='imgs/santuario.png') }}"
+            alt="Santuário de Atena"
+            class="img-fluid rounded shadow imagem-inicio"
+        >
+
+        <div class="mt-4 d-flex justify-content-center flex-wrap gap-3">
+
+            <a href="{{ url_for('galeria') }}" class="btn btn-primary btn-lg">
+                Explorar publicações
+            </a>
+
+            <a href="{{ url_for('enciclopedia') }}" class="btn btn-outline-light btn-lg">
+                Conhecer os Cavaleiros
+            </a>
+
+            <a href="{{ url_for('casas') }}" class="btn btn-outline-light btn-lg">
+                Doze Casas
+            </a>
+
+        </div>
+
+    </div>
+
+    <hr>
+
+    <!-- FUNCIONALIDADES -->
+
+    <h2 class="mb-4">Explore o Santuário</h2>
+
+    <div class="row g-4 mb-5">
+
+        <!-- GALERIA -->
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card inicio-card h-100">
+
+                <div class="card-body">
+                    <h3>Galeria</h3>
+
+                    <p>
+                        Compartilhe imagens e publicações
+                        com os outros membros da comunidade.
+                    </p>
+
+                    <a href="{{ url_for('galeria') }}" class="btn btn-primary">
+                        Acessar galeria
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ENCICLOPÉDIA -->
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card inicio-card h-100">
+
+                <div class="card-body">
+                    <h3>Enciclopédia</h3>
+
+                    <p>
+                        Conheça os Cavaleiros, suas constelações,
+                        armaduras e técnicas especiais.
+                    </p>
+
+                    <a href="{{ url_for('enciclopedia') }}" class="btn btn-primary">
+                        Explorar
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- DESAFIOS -->
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card inicio-card h-100">
+
+                <div class="card-body">
+                    <h3>Desafios</h3>
+
+                    <p>
+                        Teste seus conhecimentos sobre
+                        o universo de Cavaleiros do Zodíaco.
+                    </p>
+
+                    <a href="#" class="btn btn-primary">
+                        Em breve
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- DOZE CASAS -->
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card inicio-card h-100">
+
+                <div class="card-body">
+                    <h3>Doze Casas</h3>
+
+                    <p>
+                        Descubra os doze templos e seus
+                        poderosos Cavaleiros de Ouro.
+                    </p>
+
+                    <a href="{{ url_for('casas') }}" class="btn btn-primary">
+                        Conhecer as Casas
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CHAT -->
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card inicio-card h-100">
+
+                <div class="card-body">
+                    <h3>Chat</h3>
+
+                    <p>
+                        Converse com outros fãs e compartilhe
+                        suas opiniões sobre o anime.
+                    </p>
+
+                    <a href="{{ url_for('chat_page') }}" class="btn btn-primary">
+                        Entrar no chat
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RANKING -->
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card inicio-card h-100">
+
+                <div class="card-body">
+                    <h3>Ranking</h3>
+
+                    <p>
+                        Confira a classificação dos membros
+                        do Santuário Social.
+                    </p>
+
+                    <a href="{{ url_for('ranking') }}" class="btn btn-primary">
+                        Ver ranking
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock content %}

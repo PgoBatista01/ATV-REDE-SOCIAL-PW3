@@ -1,0 +1,187 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Meu Perfil | Santuário Social{% endblock %}
+
+{% block content %}
+
+<main class="container py-5">
+
+    <div class="text-center mb-4">
+        <h1>Meu Perfil</h1>
+        <p>Seu espaço no Santuário de Atena</p>
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8 col-lg-6">
+
+            <!-- INFORMAÇÕES DO PERFIL -->
+
+            <div class="card perfil-card text-center">
+
+                <div class="mb-3">
+
+                    {% if usuario.foto_perfil %}
+
+                        <img
+                            src="{{ url_for('static', filename='uploads/' + usuario.foto_perfil) }}"
+                            alt="Foto de perfil"
+                            class="perfil-foto"
+                        >
+
+                    {% else %}
+
+                        <div class="perfil-sem-foto">
+                            <img
+                                src="{{ url_for('static', filename='imgs/atena.png') }}"
+                                alt="Atena"
+                            >
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <h2>{{ usuario.nome }}</h2>
+
+                <p>{{ usuario.email }}</p>
+
+                <hr>
+
+                <h3>Sobre mim</h3>
+
+                <p>
+                    {{ usuario.biografia or 'Este Cavaleiro ainda não adicionou uma biografia.' }}
+                </p>
+
+                <div class="perfil-informacoes">
+
+                    <p>
+                        <strong>Personagem favorito:</strong>
+                        {{ usuario.personagem_favorito or 'Não informado' }}
+                    </p>
+
+                    <p>
+                        <strong>Armadura favorita:</strong>
+                        {{ usuario.armadura_favorita or 'Não informada' }}
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- EDITAR PERFIL -->
+
+            <div class="card perfil-card mt-4">
+
+                <h3 class="text-center mb-4">Editar Perfil</h3>
+
+                <form
+                    action="{{ url_for('perfil') }}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
+
+                    <div class="mb-3">
+
+                        <label for="nome" class="form-label">
+                            Nome
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nome"
+                            name="nome"
+                            class="form-control"
+                            value="{{ usuario.nome }}"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label for="biografia" class="form-label">
+                            Biografia
+                        </label>
+
+                        <textarea
+                            id="biografia"
+                            name="biografia"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Conte um pouco sobre você..."
+                        >{{ usuario.biografia or '' }}</textarea>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label for="personagem_favorito" class="form-label">
+                            Personagem favorito
+                        </label>
+
+                        <input
+                            type="text"
+                            id="personagem_favorito"
+                            name="personagem_favorito"
+                            class="form-control"
+                            value="{{ usuario.personagem_favorito or '' }}"
+                            placeholder="Ex.: Seiya de Pégaso"
+                        >
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label for="armadura_favorita" class="form-label">
+                            Armadura favorita
+                        </label>
+
+                        <input
+                            type="text"
+                            id="armadura_favorita"
+                            name="armadura_favorita"
+                            class="form-control"
+                            value="{{ usuario.armadura_favorita or '' }}"
+                            placeholder="Ex.: Armadura de Sagitário"
+                        >
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label for="foto_perfil" class="form-label">
+                            Foto de perfil
+                        </label>
+
+                        <input
+                            type="file"
+                            id="foto_perfil"
+                            name="foto_perfil"
+                            class="form-control"
+                            accept=".png,.jpg,.jpeg,.gif,.webp"
+                        >
+
+                    </div>
+
+                    <div class="d-grid mt-4">
+
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Salvar alterações
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+{% endblock content %}

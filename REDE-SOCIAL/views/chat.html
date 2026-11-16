@@ -1,0 +1,62 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Chat | Santuário Social{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="text-center mb-4">
+        <h1>Chat dos Cavaleiros</h1>
+        <p>Converse com outros membros do Santuário.</p>
+    </div>
+
+    <div class="chat-container">
+
+        <div class="chat-header">
+            <h3>Salão dos Cavaleiros</h3>
+            <p>Compartilhe suas ideias com a comunidade</p>
+        </div>
+
+        <div id="chat-mensagens" class="chat-mensagens">
+            <div class="chat-sistema">
+                Bem-vindo ao chat do Santuário Social!
+            </div>
+        </div>
+
+        <form id="chat-formulario" class="p-3">
+
+            <div class="input-group">
+
+                <input
+                    type="text"
+                    id="mensagem"
+                    class="form-control"
+                    placeholder="Digite sua mensagem..."
+                    maxlength="500"
+                    autocomplete="off"
+                    required
+                >
+
+                <button type="submit" class="btn btn-primary">
+                    Enviar
+                </button>
+
+            </div>
+
+            <small class="text-secondary">
+                Pressione Enter para enviar sua mensagem.
+            </small>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+
+{% endblock content %}

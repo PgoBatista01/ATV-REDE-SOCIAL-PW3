@@ -1,0 +1,117 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Ranking | Santuário Social{% endblock %}
+
+{% block content %}
+
+<main class="container py-5">
+
+    <div class="text-center mb-4">
+        <h1>Ranking do Santuário</h1>
+
+        <p>
+            Descubra quais membros conquistaram mais pontos
+            na comunidade dos Cavaleiros de Atena!
+        </p>
+    </div>
+
+    <div class="card ranking-card">
+
+        <div class="ranking-header text-center">
+            <h2>Classificação dos Cavaleiros</h2>
+            <p>Os destaques do Santuário Social</p>
+        </div>
+
+        {% if usuarios %}
+
+            <div class="table-responsive">
+
+                <table class="table ranking-table text-center align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Cavaleiro</th>
+                            <th>Pontuação</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for usuario in usuarios %}
+
+                            <tr>
+
+                                <td class="ranking-posicao">
+
+                                    {% if loop.index == 1 %}
+                                        <span class="medalha primeiro">1º</span>
+                                    {% elif loop.index == 2 %}
+                                        <span class="medalha segundo">2º</span>
+                                    {% elif loop.index == 3 %}
+                                        <span class="medalha terceiro">3º</span>
+                                    {% else %}
+                                        {{ loop.index }}º
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    <strong>{{ usuario.nome }}</strong>
+                                </td>
+
+                                <td>
+                                    <span class="ranking-pontos">
+                                        {{ usuario.pontos or 0 }} pontos
+                                    </span>
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <h3>Nenhum Cavaleiro no ranking ainda</h3>
+
+                <p>
+                    Participe das atividades da comunidade
+                    para aparecer na classificação!
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <!-- COMO GANHAR PONTOS -->
+
+    <div class="card ranking-card ranking-informacoes text-center mt-4">
+
+        <h3>Como ganhar pontos?</h3>
+
+        <p>
+            Participe dos desafios e atividades do Santuário
+            para aumentar sua pontuação e subir no ranking.
+        </p>
+
+        <a href="{{ url_for('enciclopedia') }}"
+           class="btn btn-primary mt-2">
+            Explorar os Cavaleiros
+        </a>
+
+    </div>
+
+</main>
+
+{% endblock content %}

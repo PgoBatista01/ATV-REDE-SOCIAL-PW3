@@ -1,0 +1,92 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Cadastro | Santuário Social{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="card mt-4">
+
+        <div class="card-header text-center">
+            <h2>Criar Conta</h2>
+            <p>Faça parte da comunidade dos Cavaleiros de Atena</p>
+        </div>
+
+        <div class="card-body">
+
+            <form action="{{ url_for('cadastro') }}" method="POST">
+
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome</label>
+
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        class="form-control"
+                        placeholder="Insira seu nome"
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="nickname" class="form-label">Nickname</label>
+
+                    <input
+                        type="text"
+                        id="nickname"
+                        name="nickname"
+                        class="form-control"
+                        placeholder="Como deseja ser chamado?"
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-control"
+                        placeholder="Insira seu e-mail"
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="senha" class="form-label">Senha</label>
+
+                    <input
+                        type="password"
+                        id="senha"
+                        name="senha"
+                        class="form-control"
+                        placeholder="Crie uma senha"
+                        minlength="6"
+                        required
+                    >
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        Cadastrar
+                    </button>
+                </div>
+
+            </form>
+
+            <div class="text-center mt-3">
+                <p>Já possui uma conta?</p>
+                <a href="{{ url_for('login') }}">Faça login</a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %}

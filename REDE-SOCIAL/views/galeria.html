@@ -1,0 +1,191 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Galeria | Santuário Social{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- CABEÇALHO -->
+
+    <div class="text-center mb-5">
+        <h1>Galeria do Santuário</h1>
+
+        <p>
+            Compartilhe seus momentos, imagens e experiências
+            com os outros Cavaleiros.
+        </p>
+    </div>
+
+    <!-- MENSAGENS FLASH -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% for category, message in messages %}
+
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+
+                {{ message }}
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar">
+                </button>
+
+            </div>
+
+        {% endfor %}
+
+    {% endwith %}
+
+    <!-- FORMULÁRIO DE PUBLICAÇÃO -->
+
+    <div class="card galeria-formulario mb-5">
+
+        <div class="card-header text-center">
+            <h3>Nova publicação</h3>
+        </div>
+
+        <div class="card-body">
+
+            <form
+                action="{{ url_for('galeria') }}"
+                method="POST"
+                enctype="multipart/form-data">
+
+                <div class="mb-3">
+
+                    <label for="file" class="form-label">
+                        Escolha uma imagem:
+                    </label>
+
+                    <input
+                        type="file"
+                        id="file"
+                        name="file"
+                        class="form-control"
+                        accept=".jpg,.jpeg,.png,.gif,.webp"
+                        required
+                    >
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label for="legenda" class="form-label">
+                        Legenda da publicação:
+                    </label>
+
+                    <textarea
+                        id="legenda"
+                        name="legenda"
+                        class="form-control"
+                        rows="3"
+                        maxlength="500"
+                        placeholder="Compartilhe algo com a comunidade..."></textarea>
+
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        Publicar imagem
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- PUBLICAÇÕES -->
+
+    <h2 class="text-center mb-4">Publicações dos Cavaleiros</h2>
+
+    <div class="row g-4">
+
+        {% for imagem in imagens %}
+
+        <div class="col-md-6 col-lg-4">
+
+            <div class="card post-card h-100">
+
+                <div class="post-conteudo">
+
+                    <h5>Publicação do Santuário</h5>
+
+                </div>
+
+                <div class="post-imagem-container">
+
+                    <img
+                        src="{{ url_for('static', filename='uploads/' + imagem.filename) }}"
+                        class="post-imagem"
+                        alt="Imagem publicada na galeria">
+
+                </div>
+
+                <div class="post-conteudo">
+
+                    {% if imagem.legenda %}
+                        <p>{{ imagem.legenda }}</p>
+                    {% endif %}
+
+                    {% if imagem.data %}
+                        <small class="post-data">
+                            {{ imagem.data.strftime('%d/%m/%Y às %H:%M') }}
+                        </small>
+                    {% endif %}
+
+                </div>
+
+                {% if imagem.usuario_id == session.get('usuario_id') %}
+
+                <div class="card-footer text-end">
+
+                    <form
+                        action="{{ url_for('excluir_imagem', id=imagem.id) }}"
+                        method="POST"
+                        onsubmit="return confirm('Deseja excluir esta publicação?');">
+
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Excluir publicação
+                        </button>
+
+                    </form>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="col-12 text-center">
+
+            <div class="card p-5">
+
+                <h3>Nenhuma publicação ainda</h3>
+
+                <p>
+                    Seja o primeiro Cavaleiro a compartilhar
+                    uma imagem no Santuário!
+                </p>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock content %}
