@@ -1,410 +1,697 @@
 
-# IMPORTANDO BIBLIOTECAS DO FLASK
-from flask import (
-    render_template,
-    request,
-    redirect,
-    url_for,
-    flash,
-    session
-)
+"""Rotas principais do Santuário Social."""
 
-# IMPORTANDO OS MODELOS DO BANCO
-from models.database import (
-    db,
-    Cavaleiro,
-    Curiosidade,
-    Usuario,
-    Imagem
-)
-
-# CRIPTOGRAFIA DE SENHAS
-from werkzeug.security import (
-    generate_password_hash,
-    check_password_hash
-)
-
-# MANIPULACAO DE ARQUIVOS
 import os
 import uuid
+
+from flask import (
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+
+from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
+
+from werkzeug.security import (
+    check_password_hash,
+    generate_password_hash
+)
+
 from werkzeug.utils import secure_filename
 
+from models.database import (
+    Cavaleiro,
+    Curiosidade,
+    Imagem,
+    PublicacaoCavaleiro,
+    Usuario,
+    db
+)
 
-# ==========================================================
-# FUNCAO PRINCIPAL PARA INICIALIZAR AS ROTAS
-# ==========================================================
 
-def init_app(app):
+EXTENSOES_IMAGEM = {"png", "jpg", "jpeg", "gif", "webp"}
 
-    # CONFIGURACAO DA PASTA DE UPLOAD
-    app.config.setdefault(
-        'UPLOAD_FOLDER',
-        os.path.join(app.static_folder, 'uploads')
+
+# USUÁRIO ATUAL
+def obter_usuario_atual():
+    """Devolve o usuário atual da sessão."""
+
+    usuario_id = session.get("usuario_id")
+
+    if usuario_id is None:
+        return None
+
+    try:
+        usuario_id = int(usuario_id)
+
+    except (TypeError, ValueError):
+        session.pop("usuario_id", None)
+        session.pop("usuario_nome", None)
+        return None
+
+    usuario = db.session.get(Usuario, usuario_id)
+
+    if usuario is None:
+        session.pop("usuario_id", None)
+        session.pop("usuario_nome", None)
+
+    return usuario
+
+
+# VALIDAR EXTENSÃO DA IMAGEM
+def extensao_imagem_permitida(filename):
+
+    nome_seguro = secure_filename(filename or "")
+
+    return bool(
+        nome_seguro
+        and "." in nome_seguro
+        and nome_seguro.rsplit(".", 1)[1].lower() in EXTENSOES_IMAGEM
     )
 
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-    # EXTENSOES PERMITIDAS
-    EXTENSOES_PERMITIDAS = {
-        'png', 'jpg', 'jpeg', 'gif', 'webp'
-    }
+# GUARDAR IMAGEM
+def guardar_imagem(upload, prefixo="imagem"):
+    """Guarda uma imagem na pasta static/uploads."""
 
-    def arquivo_permitido(filename):
-        return (
-            '.' in filename
-            and filename.rsplit('.', 1)[1].lower()
-            in EXTENSOES_PERMITIDAS
+    if upload is None or not upload.filename:
+        return None
+
+    original = secure_filename(upload.filename)
+
+    if not extensao_imagem_permitida(original):
+        raise ValueError(
+            "Formato de imagem inválido. Use PNG, JPG, JPEG, GIF ou WEBP."
         )
 
-    # ======================================================
-    # MIDDLEWARE DE AUTENTICACAO
-    # ======================================================
+    extensao = original.rsplit(".", 1)[1].lower()
+    filename = f"{prefixo}_{uuid.uuid4().hex}.{extensao}"
 
-    @app.before_request
-    def check_auth():
+    pasta = current_app.config.get("UPLOAD_FOLDER")
 
-        rotas_permitidas = [
-            'home',
-            'login',
-            'cadastro',
-            'static'
-        ]
+    if not pasta:
+        pasta = os.path.join(
+            current_app.static_folder or "static",
+            "uploads"
+        )
 
-        if request.endpoint in rotas_permitidas:
-            return
+        current_app.config["UPLOAD_FOLDER"] = pasta
 
-        if 'usuario_id' not in session:
-            flash('Faça login para acessar esta página.', 'warning')
-            return redirect(url_for('login'))
+    os.makedirs(pasta, exist_ok=True)
 
-    # ======================================================
-    # ROTA HOME
-    # ======================================================
+    upload.save(os.path.join(pasta, filename))
 
-    @app.route('/')
-    def home():
+    return filename
 
-        return render_template('index.html')
 
-    # ======================================================
-    # ROTA ENCICLOPEDIA
-    # ======================================================
+# REGISTRAR ROTAS
+def init_app(app):
 
-    @app.route('/enciclopedia')
-    def enciclopedia():
+    app.config.setdefault(
+        "MAX_CONTENT_LENGTH",
+        16 * 1024 * 1024
+    )
+
+    # INÍCIO
+    @app.route("/")
+    def index():
 
         cavaleiros = Cavaleiro.query.order_by(
-            Cavaleiro.nome
-        ).all()
-
-        curiosidades = Curiosidade.query.all()
+            Cavaleiro.id.asc()
+        ).limit(6).all()
 
         return render_template(
-            'enciclopedia.html',
+            "index.html",
             cavaleiros=cavaleiros,
-            curiosidades=curiosidades
+            usuario=obter_usuario_atual()
         )
 
-    # ======================================================
-    # ROTA DAS DOZE CASAS
-    # ======================================================
+    app.add_url_rule(
+        "/",
+        endpoint="home",
+        view_func=index
+    )
 
-    @app.route('/casas')
-    def casas():
-
-        return render_template('casas.html')
-
-    # ======================================================
-    # ROTA DO CHAT
-    # ======================================================
-
-    @app.route('/chat')
-    def chat_page():
-
-        nickname = session.get('usuario_nickname')
-
-        return render_template(
-            'chat.html',
-            nickname=nickname
-        )
-
-    # ======================================================
-    # ROTA DE CADASTRO
-    # ======================================================
-
-    @app.route('/cadastro', methods=['GET', 'POST'])
+    # CADASTRO
+    @app.route("/cadastro", methods=["GET", "POST"])
     def cadastro():
 
-        if request.method == 'POST':
+        if request.method == "POST":
 
-            nome = request.form.get('nome', '').strip()
-            nickname = request.form.get('nickname', '').strip()
-            email = request.form.get('email', '').strip().lower()
-            senha = request.form.get('senha', '')
+            nome = request.form.get("nome", "").strip()
+            nickname = request.form.get("nickname", "").strip()
+            email = request.form.get("email", "").strip().lower()
+            senha = request.form.get("senha", "")
+            confirmar = request.form.get("confirmar_senha", "")
 
-            if not nome or not nickname or not email or not senha:
-                flash('Preencha todos os campos.', 'danger')
-                return redirect(url_for('cadastro'))
+            if not all((nome, nickname, email, senha)):
 
-            if len(senha) < 6:
-                flash('A senha deve ter pelo menos 6 caracteres.', 'danger')
-                return redirect(url_for('cadastro'))
+                flash(
+                    "Preencha todos os campos obrigatórios.",
+                    "danger"
+                )
 
-            usuario_existente = Usuario.query.filter(
-                (Usuario.email == email) |
-                (Usuario.nickname == nickname)
-            ).first()
+            elif len(senha) < 8:
 
-            if usuario_existente:
-                flash('E-mail ou nickname já cadastrado.', 'danger')
-                return redirect(url_for('cadastro'))
+                flash(
+                    "A senha deve ter pelo menos 8 caracteres.",
+                    "warning"
+                )
 
-            senha_hash = generate_password_hash(
-                senha,
-                method='scrypt'
-            )
+            elif confirmar and senha != confirmar:
 
-            novo_usuario = Usuario(
-                nome=nome,
-                nickname=nickname,
-                email=email,
-                senha=senha_hash
-            )
+                flash(
+                    "As senhas não coincidem.",
+                    "danger"
+                )
 
-            try:
-                db.session.add(novo_usuario)
-                db.session.commit()
+            elif Usuario.query.filter(
+                or_(
+                    Usuario.email == email,
+                    Usuario.nickname == nickname
+                )
+            ).first():
 
-                flash('Cadastro realizado com sucesso! Faça seu login.', 'success')
-                return redirect(url_for('login'))
+                flash(
+                    "Esse e-mail ou nickname já está registado.",
+                    "danger"
+                )
 
-            except Exception:
-                db.session.rollback()
-                flash('Não foi possível realizar o cadastro.', 'danger')
+            else:
 
-        return render_template('cadastro.html')
+                usuario = Usuario(
+                    nome=nome,
+                    nickname=nickname,
+                    email=email,
+                    senha=generate_password_hash(senha)
+                )
 
-    # ======================================================
-    # ROTA DE LOGIN
-    # ======================================================
+                db.session.add(usuario)
 
-    @app.route('/login', methods=['GET', 'POST'])
+                try:
+                    db.session.commit()
+
+                except IntegrityError:
+                    db.session.rollback()
+
+                    flash(
+                        "Esse e-mail ou nickname já está registado.",
+                        "danger"
+                    )
+
+                else:
+
+                    session.clear()
+
+                    session["usuario_id"] = usuario.id
+                    session["usuario_nome"] = usuario.nome
+
+                    flash(
+                        "Cadastro efetuado. Bem-vindo ao Santuário!",
+                        "success"
+                    )
+
+                    return redirect(url_for("perfil"))
+
+        return render_template("cadastro.html")
+
+    # LOGIN
+    @app.route("/login", methods=["GET", "POST"])
     def login():
 
-        if request.method == 'POST':
+        next_url = (
+            request.args.get("next")
+            or request.form.get("next")
+        )
 
-            email = request.form.get('email', '').strip().lower()
-            senha = request.form.get('senha', '')
+        if request.method == "POST":
 
-            usuario = Usuario.query.filter_by(
-                email=email
+            identificador = request.form.get(
+                "identificador", ""
+            ).strip()
+
+            if not identificador:
+
+                identificador = request.form.get(
+                    "email",
+                    request.form.get("nickname", "")
+                ).strip()
+
+            senha = request.form.get("senha", "")
+
+            usuario = Usuario.query.filter(
+                or_(
+                    Usuario.email == identificador.lower(),
+                    Usuario.nickname == identificador
+                )
             ).first()
 
-            if usuario and check_password_hash(usuario.senha, senha):
+            if usuario and check_password_hash(
+                usuario.senha,
+                senha
+            ):
 
                 session.clear()
 
-                session['usuario_id'] = usuario.id
-                session['usuario_nome'] = usuario.nome
-                session['usuario_email'] = usuario.email
-                session['usuario_nickname'] = usuario.nickname
+                session["usuario_id"] = usuario.id
+                session["usuario_nome"] = usuario.nome
 
-                flash('Login realizado com sucesso!', 'success')
-
-                return redirect(url_for('home'))
-
-            flash('E-mail ou senha incorretos.', 'danger')
-            return redirect(url_for('login'))
-
-        return render_template('login.html')
-
-    # ======================================================
-    # ROTA DE PERFIL
-    # ======================================================
-
-    @app.route('/perfil', methods=['GET', 'POST'])
-    def perfil():
-
-        usuario = Usuario.query.get(session['usuario_id'])
-
-        if not usuario:
-            session.clear()
-            flash('Usuário não encontrado. Faça login novamente.', 'danger')
-            return redirect(url_for('login'))
-
-        if request.method == 'POST':
-
-            nome = request.form.get('nome', '').strip()
-            biografia = request.form.get('biografia', '').strip()
-            personagem = request.form.get('personagem_favorito', '').strip()
-            carta = request.form.get('carta_favorita', '').strip()
-
-            if not nome:
-                flash('O nome não pode ficar vazio.', 'danger')
-                return redirect(url_for('perfil'))
-
-            usuario.nome = nome
-            usuario.biografia = biografia
-            usuario.personagem_favorito = personagem
-            usuario.carta_favorita = carta
-
-            foto = request.files.get('foto_perfil')
-
-            if foto and foto.filename:
-
-                if not arquivo_permitido(foto.filename):
-                    flash('Formato de imagem não permitido.', 'danger')
-                    return redirect(url_for('perfil'))
-
-                extensao = secure_filename(foto.filename).rsplit('.', 1)[1].lower()
-                novo_nome = f'{uuid.uuid4().hex}.{extensao}'
-
-                caminho = os.path.join(
-                    app.config['UPLOAD_FOLDER'],
-                    novo_nome
+                flash(
+                    f"Bem-vindo, {usuario.nickname}!",
+                    "success"
                 )
 
-                foto.save(caminho)
+                if (
+                    next_url
+                    and next_url.startswith("/")
+                    and not next_url.startswith("//")
+                ):
+                    return redirect(next_url)
 
-                usuario.foto_perfil = novo_nome
+                return redirect(url_for("perfil"))
 
-            try:
-                db.session.commit()
-
-                session['usuario_nome'] = usuario.nome
-
-                flash('Perfil atualizado com sucesso!', 'success')
-                return redirect(url_for('perfil'))
-
-            except Exception:
-                db.session.rollback()
-                flash('Não foi possível atualizar o perfil.', 'danger')
-
-        return render_template(
-            'perfil.html',
-            usuario=usuario
-        )
-
-    # ======================================================
-    # ROTA DO RANKING
-    # ======================================================
-
-    @app.route('/ranking')
-    def ranking():
-
-        usuarios = Usuario.query.order_by(
-            Usuario.pontos.desc(),
-            Usuario.nome.asc()
-        ).all()
-
-        return render_template(
-            'ranking.html',
-            usuarios=usuarios
-        )
-
-    # ======================================================
-    # ROTA DA GALERIA
-    # ======================================================
-
-    @app.route('/galeria', methods=['GET', 'POST'])
-    def galeria():
-
-        if request.method == 'POST':
-
-            arquivo = request.files.get('file')
-            legenda = request.form.get('legenda', '').strip()
-
-            if not arquivo or not arquivo.filename:
-                flash('Selecione uma imagem.', 'danger')
-                return redirect(url_for('galeria'))
-
-            if not arquivo_permitido(arquivo.filename):
-                flash('Formato de imagem não permitido.', 'danger')
-                return redirect(url_for('galeria'))
-
-            extensao = secure_filename(arquivo.filename).rsplit('.', 1)[1].lower()
-            filename = f'{uuid.uuid4().hex}.{extensao}'
-
-            caminho = os.path.join(
-                app.config['UPLOAD_FOLDER'],
-                filename
+            flash(
+                "E-mail/nickname ou senha incorretos.",
+                "danger"
             )
 
-            try:
-                arquivo.save(caminho)
-
-                imagem = Imagem(
-                    filename=filename,
-                    legenda=legenda,
-                    usuario_id=session['usuario_id']
-                )
-
-                db.session.add(imagem)
-                db.session.commit()
-
-                flash('Imagem publicada com sucesso!', 'success')
-
-            except Exception:
-                db.session.rollback()
-
-                if os.path.exists(caminho):
-                    os.remove(caminho)
-
-                flash('Não foi possível publicar a imagem.', 'danger')
-
-            return redirect(url_for('galeria'))
-
-        imagens = Imagem.query.order_by(
-            Imagem.data.desc()
-        ).all()
-
         return render_template(
-            'galeria.html',
-            imagens=imagens
+            "login.html",
+            next=next_url
         )
 
-    # ======================================================
-    # ROTA PARA EXCLUIR UMA IMAGEM
-    # ======================================================
-
-    @app.route('/galeria/excluir/<int:id>', methods=['POST'])
-    def excluir_imagem(id):
-
-        imagem = Imagem.query.get_or_404(id)
-
-        if imagem.usuario_id != session['usuario_id']:
-            flash('Você não pode excluir esta publicação.', 'danger')
-            return redirect(url_for('galeria'))
-
-        caminho = os.path.join(
-            app.config['UPLOAD_FOLDER'],
-            imagem.filename
-        )
-
-        try:
-            db.session.delete(imagem)
-            db.session.commit()
-
-            if os.path.exists(caminho):
-                os.remove(caminho)
-
-            flash('Publicação excluída com sucesso!', 'success')
-
-        except Exception:
-            db.session.rollback()
-            flash('Não foi possível excluir a publicação.', 'danger')
-
-        return redirect(url_for('galeria'))
-
-    # ======================================================
-    # ROTA DE LOGOUT
-    # ======================================================
-
-    @app.route('/logout')
+    # SAIR
+    @app.route("/logout", methods=["GET", "POST"])
     def logout():
 
         session.clear()
 
-        flash('Você saiu da sua conta.', 'success')
+        flash(
+            "Sessão terminada.",
+            "info"
+        )
 
-        return redirect(url_for('home'))
+        return redirect(url_for("index"))
+
+    # PERFIL DO USUÁRIO
+    @app.route("/perfil", methods=["GET", "POST"])
+    def perfil():
+
+        usuario = obter_usuario_atual()
+
+        if usuario is None:
+
+            flash(
+                "Inicie sessão para aceder ao perfil.",
+                "warning"
+            )
+
+            return redirect(
+                url_for(
+                    "login",
+                    next=url_for("perfil")
+                )
+            )
+
+        if request.method == "POST":
+
+            nome = request.form.get(
+                "nome",
+                usuario.nome
+            ).strip()
+
+            if not nome:
+
+                flash(
+                    "O nome não pode ficar vazio.",
+                    "warning"
+                )
+
+                return redirect(url_for("perfil"))
+
+            usuario.nome = nome
+
+            usuario.biografia = (
+                request.form.get("biografia", "").strip() or None
+            )
+
+            usuario.personagem_favorito = (
+                request.form.get(
+                    "personagem_favorito",
+                    ""
+                ).strip() or None
+            )
+
+            usuario.carta_favorita = (
+                request.form.get(
+                    "carta_favorita",
+                    ""
+                ).strip() or None
+            )
+
+            foto = request.files.get("foto_perfil")
+
+            if foto and foto.filename:
+
+                try:
+                    usuario.foto_perfil = guardar_imagem(
+                        foto,
+                        "perfil"
+                    )
+
+                except ValueError as exc:
+
+                    flash(str(exc), "danger")
+
+                    return redirect(url_for("perfil"))
+
+            try:
+                db.session.commit()
+
+            except IntegrityError:
+
+                db.session.rollback()
+
+                flash(
+                    "Não foi possível atualizar o perfil.",
+                    "danger"
+                )
+
+            else:
+
+                session["usuario_nome"] = usuario.nome
+
+                flash(
+                    "Perfil atualizado com sucesso.",
+                    "success"
+                )
+
+            return redirect(url_for("perfil"))
+
+        return render_template(
+            "perfil.html",
+            usuario=usuario
+        )
+
+    # ENCICLOPÉDIA
+    @app.route("/enciclopedia")
+    def enciclopedia():
+
+        cavaleiros = Cavaleiro.query.order_by(
+            Cavaleiro.id.asc()
+        ).all()
+
+        curiosidades = Curiosidade.query.order_by(
+            Curiosidade.id.asc()
+        ).all()
+
+        return render_template(
+            "enciclopedia.html",
+            cavaleiros=cavaleiros,
+            curiosidades=curiosidades
+        )
+
+    # CASAS DO ZODÍACO
+    @app.route("/casas")
+    @app.route("/doze-casas")
+    def casas():
+
+        return render_template("casas.html")
+
+    # PERSONAGENS
+    @app.route("/personagens")
+    @app.route("/cavaleiros")
+    def personagens():
+
+        return redirect(url_for("enciclopedia"))
+
+    # PERFIL INDIVIDUAL DO CAVALEIRO
+    @app.route(
+        "/perfil-cavaleiro/<int:cavaleiro_id>",
+        endpoint="perfil_cavaleiro"
+    )
+    @app.route("/cavaleiro/<int:cavaleiro_id>")
+    def detalhe_cavaleiro(cavaleiro_id):
+
+        cavaleiro = db.session.get(
+            Cavaleiro,
+            cavaleiro_id
+        )
+
+        if cavaleiro is None:
+            abort(404)
+
+        # PUBLICAÇÕES DO CAVALEIRO
+        publicacoes = PublicacaoCavaleiro.query.filter_by(
+            cavaleiro_id=cavaleiro.id
+        ).order_by(
+            PublicacaoCavaleiro.data.desc(),
+            PublicacaoCavaleiro.id.desc()
+        ).all()
+
+        return render_template(
+            "perfil_cavaleiros.html",
+            cavaleiro=cavaleiro,
+            publicacoes=publicacoes,
+            usuario=obter_usuario_atual()
+        )
+
+    # FEED DO SANTUÁRIO
+    @app.route("/feed")
+    def feed():
+
+        # PUBLICAÇÕES DOS CAVALEIROS
+        publicacoes = PublicacaoCavaleiro.query.order_by(
+            PublicacaoCavaleiro.data.desc(),
+            PublicacaoCavaleiro.id.desc()
+        ).all()
+
+        # PUBLICAÇÕES DOS USUÁRIOS
+        publicacoes_usuarios = Imagem.query.order_by(
+            Imagem.data.desc(),
+            Imagem.id.desc()
+        ).all()
+
+        return render_template(
+            "feed.html",
+            publicacoes=publicacoes,
+            publicacoes_usuarios=publicacoes_usuarios,
+            usuario=obter_usuario_atual()
+        )
+
+    # GALERIA
+    @app.route("/galeria", methods=["GET", "POST"])
+    def galeria():
+
+        usuario = obter_usuario_atual()
+
+        if request.method == "POST":
+
+            if usuario is None:
+
+                flash(
+                    "Inicie sessão para publicar uma imagem.",
+                    "warning"
+                )
+
+                return redirect(
+                    url_for(
+                        "login",
+                        next=url_for("galeria")
+                    )
+                )
+
+            upload = (
+                request.files.get("file")
+                or request.files.get("imagem")
+            )
+
+            legenda = request.form.get(
+                "legenda",
+                ""
+            ).strip()
+
+            if upload is None or not upload.filename:
+
+                flash(
+                    "Selecione uma imagem para publicar.",
+                    "warning"
+                )
+
+            elif len(legenda) > 500:
+
+                flash(
+                    "A legenda não pode exceder 500 caracteres.",
+                    "warning"
+                )
+
+            else:
+
+                try:
+                    filename = guardar_imagem(
+                        upload,
+                        "galeria"
+                    )
+
+                except ValueError as exc:
+
+                    flash(str(exc), "danger")
+
+                else:
+
+                    imagem = Imagem(
+                        filename=filename,
+                        legenda=legenda or None,
+                        usuario_id=usuario.id
+                    )
+
+                    db.session.add(imagem)
+
+                    try:
+                        db.session.commit()
+
+                    except IntegrityError:
+
+                        db.session.rollback()
+
+                        caminho = os.path.join(
+                            current_app.config["UPLOAD_FOLDER"],
+                            filename
+                        )
+
+                        if os.path.exists(caminho):
+                            os.remove(caminho)
+
+                        flash(
+                            "Não foi possível guardar a imagem.",
+                            "danger"
+                        )
+
+                    else:
+
+                        flash(
+                            "Imagem publicada na galeria.",
+                            "success"
+                        )
+
+                        return redirect(url_for("galeria"))
+
+        imagens = Imagem.query.order_by(
+            Imagem.data.desc(),
+            Imagem.id.desc()
+        ).all()
+
+        return render_template(
+            "galeria.html",
+            imagens=imagens,
+            usuario=usuario
+        )
+
+    # EXCLUIR PUBLICAÇÃO DA GALERIA
+    @app.post("/galeria/excluir/<int:id>")
+    def excluir_imagem(id):
+
+        usuario = obter_usuario_atual()
+
+        if usuario is None:
+
+            flash(
+                "Inicie sessão para excluir uma publicação.",
+                "warning"
+            )
+
+            return redirect(
+                url_for(
+                    "login",
+                    next=url_for("galeria")
+                )
+            )
+
+        imagem = db.session.get(
+            Imagem,
+            id
+        )
+
+        if imagem is None:
+            abort(404)
+
+        if imagem.usuario_id != usuario.id:
+            abort(403)
+
+        filename = secure_filename(
+            imagem.filename or ""
+        )
+
+        pasta = current_app.config.get(
+            "UPLOAD_FOLDER",
+            os.path.join(
+                current_app.static_folder,
+                "uploads"
+            )
+        )
+
+        caminho = os.path.join(
+            pasta,
+            filename
+        )
+
+        db.session.delete(imagem)
+        db.session.commit()
+
+        if filename and os.path.isfile(caminho):
+            os.remove(caminho)
+
+        flash(
+            "Publicação excluída.",
+            "success"
+        )
+
+        return redirect(url_for("galeria"))
+
+    # RANKING
+    @app.route("/ranking")
+    def ranking():
+
+        usuarios = Usuario.query.order_by(
+            Usuario.pontos.desc(),
+            Usuario.nickname.asc()
+        ).limit(50).all()
+
+        return render_template(
+            "ranking.html",
+            usuarios=usuarios
+        )
+
+    # CHAT
+    @app.route("/chat", methods=["GET", "POST"])
+    def chat_page():
+
+        if obter_usuario_atual() is None:
+
+            flash(
+                "Inicie sessão para entrar no chat.",
+                "warning"
+            )
+
+            return redirect(
+                url_for(
+                    "login",
+                    next=url_for("chat_page")
+                )
+            )
+
+        return render_template("chat.html")
+
+    # QUIZ
+    @app.route("/quiz", methods=["GET", "POST"])
+    def quiz_alias():
+
+        return redirect(
+            url_for("desafios.desafios")
+        )

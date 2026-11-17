@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}Santuário Social{% endblock %}</title>
+    <title>{% block title %}Santuário Social | Comunidade{% endblock %}</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
@@ -23,9 +23,9 @@
 
         <a href="{{ url_for('home') }}">
             <img
-                src="{{ url_for('static', filename='imgs/santuario.png') }}"
+                src="{{ url_for('static', filename='imgs/logo-cdz.png') }}"
                 alt="Santuário Social"
-                width="250"
+                width="2500"
             >
         </a>
 
@@ -34,7 +34,7 @@
 
     </header>
 
-    <!-- MENU DE NAVEGAÇÃO -->
+    <!-- MENU DE NAVEGACAO -->
 
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
@@ -80,7 +80,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('galeria') }}">
+                        <a class="nav-link" href="{{ url_for('feed') }}">
                             Feed
                         </a>
                     </li>
@@ -94,6 +94,18 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('ranking') }}">
                             Ranking
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('galeria') }}">
+                            Galeria
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('desafios.desafios') }}">
+                            Desafios
                         </a>
                     </li>
 
@@ -177,7 +189,7 @@
 
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- CONTEUDO PRINCIPAL -->
 
     <main>
 
@@ -186,7 +198,7 @@
 
     </main>
 
-    <!-- RODAPÉ -->
+    <!-- RODAPE -->
 
     <footer class="rodape">
 

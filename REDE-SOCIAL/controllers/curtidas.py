@@ -1,69 +1,45 @@
+"""Curtidas temporárias para Cavaleiros, mantidas na sessão do navegador.
 
-from flask import Blueprint, session, redirect, url_for, flash, request
-from models.database import db, Post, Curtida
+O projeto não possui modelos Post/Curtida; por isso as curtidas não são
+partilhadas nem persistidas na base de dados.
+"""
 
+from flask import Blueprint, abort, flash, jsonify, redirect, request, session, url_for
+
+from models.database import Cavaleiro
 
 curtidas_bp = Blueprint("curtidas", __name__)
 
 
-# CURTIR OU DESCURTIR PUBLICAÇÃO
-@curtidas_bp.route("/curtir/<int:post_id>", methods=["POST"])
+@curtidas_bp.post("/curtir/<int:post_id>")
 def curtir(post_id):
+    if not session.get("usuario_id"):
+        flash("Faça login para interagir com os Cavaleiros!", "warning")
+        return redirect(url_for("login", next=request.referrer or url_for("feed")))
 
-    # VERIFICAR LOGIN
-    if not session.get("user_id"):
-        flash("Faça login para interagir com os cavaleiros!", "warning")
-        return redirect(url_for("login"))
+    cavaleiro = Cavaleiro.query.get_or_404(post_id)
+    curtidas = session.get("curtidas_cavaleiros", [])
+    if not isinstance(curtidas, list):
+        curtidas = []
 
-    usuario_id = session["user_id"]
-
-    # VERIFICAR SE A PUBLICAÇÃO EXISTE
-    post = db.session.get(Post, post_id)
-
-    if not post:
-        flash("Publicação não encontrada!", "danger")
-        return redirect(request.referrer or url_for("galeria"))
-
-    # VERIFICAR SE JÁ CURTIU
-    curtida = Curtida.query.filter_by(
-        usuario_id=usuario_id,
-        post_id=post_id
-    ).first()
-
-    if curtida:
-
-        # REMOVER CURTIDA
-        db.session.delete(curtida)
-        mensagem = "Você removeu sua curtida."
-
+    id_texto = str(cavaleiro.id)
+    if id_texto in curtidas:
+        curtidas.remove(id_texto)
+        flash("Você removeu sua curtida.", "info")
     else:
+        curtidas.append(id_texto)
+        flash("Você curtiu esta publicação!", "success")
 
-        # ADICIONAR CURTIDA
-        nova_curtida = Curtida(
-            usuario_id=usuario_id,
-            post_id=post_id
-        )
-
-        db.session.add(nova_curtida)
-        mensagem = "Você curtiu esta publicação!"
-
-    try:
-        db.session.commit()
-        flash(mensagem, "success")
-
-    except Exception:
-        db.session.rollback()
-        flash("Não foi possível registrar sua curtida.", "danger")
-
-    return redirect(request.referrer or url_for("galeria"))
+    session["curtidas_cavaleiros"] = curtidas
+    return redirect(request.referrer or url_for("feed"))
 
 
-# CONSULTAR QUANTIDADE DE CURTIDAS
-@curtidas_bp.route("/curtidas/<int:post_id>")
+@curtidas_bp.get("/curtidas/<int:post_id>")
 def quantidade_curtidas(post_id):
-
-    total = Curtida.query.filter_by(
-        post_id=post_id
-    ).count()
-
-    return {"post_id": post_id, "total_curtidas": total}
+    cavaleiro = Cavaleiro.query.get_or_404(post_id)
+    curtidas = session.get("curtidas_cavaleiros", [])
+    return jsonify({
+        "post_id": cavaleiro.id,
+        "total_curtidas": int(str(cavaleiro.id) in curtidas),
+        "curtido": str(cavaleiro.id) in curtidas,
+    })

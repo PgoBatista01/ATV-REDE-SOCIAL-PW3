@@ -1,0 +1,255 @@
+
+{% extends "base.html" %}
+
+{% block title %}Feed do Santuário | Santuário Social{% endblock %}
+
+{% block content %}
+
+<section class="container py-4">
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1>Feed do Santuário</h1>
+            <p class="mb-0">Acompanhe as publicações dos Cavaleiros e da comunidade.</p>
+        </div>
+
+        <a href="{{ url_for('galeria') }}" class="btn btn-primary">
+            Publicar uma imagem
+        </a>
+    </div>
+
+    <!-- PUBLICAÇÕES DOS CAVALEIROS -->
+    {% if publicacoes %}
+
+        {% for publicacao in publicacoes %}
+
+            <article class="post-card mb-4">
+
+                {% set avatar_filename = publicacao.cavaleiro.imagem %}
+                {% if avatar_filename and '/' not in avatar_filename %}
+                    {% set avatar_filename = 'imgs/' ~ avatar_filename %}
+                {% endif %}
+                {% set post_filename = publicacao.imagem %}
+                {% if post_filename and '/' not in post_filename %}
+                    {% set post_filename = 'imgs/' ~ post_filename %}
+                {% endif %}
+
+                <!-- CABEÇALHO DA PUBLICAÇÃO -->
+                <div class="post-conteudo d-flex align-items-center gap-3">
+
+                    {% if publicacao.cavaleiro.imagem %}
+
+                        <img
+                            src="{{ url_for('static', filename=avatar_filename) }}"
+                            alt="{{ publicacao.cavaleiro.nome }}"
+                            width="48"
+                            height="48"
+                            class="rounded-circle"
+                            style="object-fit: cover">
+
+                    {% else %}
+
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width:48px;height:48px;background:#192F4F;color:#F5D982;font-weight:bold">
+
+                            {{ publicacao.cavaleiro.nome[0]|upper }}
+
+                        </div>
+
+                    {% endif %}
+
+                    <div>
+
+                        <a href="{{ url_for('perfil_cavaleiro', cavaleiro_id=publicacao.cavaleiro.id) }}"
+                           class="text-decoration-none">
+
+                            <strong>{{ publicacao.cavaleiro.nome }}</strong>
+
+                        </a>
+
+                        <div class="post-data">
+                            Cavaleiro do Santuário
+                        </div>
+
+                        {% if publicacao.data %}
+
+                            <time class="post-data"
+                                  datetime="{{ publicacao.data.isoformat() }}">
+
+                                {{ publicacao.data.strftime('%d/%m/%Y às %H:%M') }}
+
+                            </time>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- IMAGEM DA PUBLICAÇÃO -->
+                {% if publicacao.imagem %}
+
+                    <a href="{{ url_for('perfil_cavaleiro', cavaleiro_id=publicacao.cavaleiro.id) }}">
+
+                        <div class="post-imagem-container">
+
+                            <img
+                                class="post-imagem"
+                                src="{{ url_for('static', filename=post_filename) }}"
+                                alt="Publicação de {{ publicacao.cavaleiro.nome }}"
+                                loading="lazy">
+
+                        </div>
+
+                    </a>
+
+                {% endif %}
+
+                <!-- LEGENDA -->
+                <div class="post-conteudo">
+
+                    <p>{{ publicacao.legenda }}</p>
+
+                    <a href="{{ url_for('perfil_cavaleiro', cavaleiro_id=publicacao.cavaleiro.id) }}"
+                       class="btn btn-outline-primary btn-sm">
+
+                        Ver perfil do Cavaleiro
+
+                    </a>
+
+                </div>
+
+            </article>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- PUBLICAÇÕES DOS USUÁRIOS -->
+    {% if publicacoes_usuarios %}
+
+        {% for publicacao in publicacoes_usuarios %}
+
+            <article class="post-card mb-4">
+
+                <!-- CABEÇALHO -->
+                <div class="post-conteudo d-flex align-items-center gap-3">
+
+                    {% if publicacao.usuario and publicacao.usuario.foto_perfil %}
+
+                        <img
+                            src="{{ url_for('static', filename='uploads/' ~ publicacao.usuario.foto_perfil) }}"
+                            alt="Foto de {{ publicacao.usuario.nickname }}"
+                            width="48"
+                            height="48"
+                            class="rounded-circle"
+                            style="object-fit: cover">
+
+                    {% else %}
+
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width:48px;height:48px;background:#192F4F;color:#F5D982;font-weight:bold">
+
+                            {{ publicacao.usuario.nome[0]|upper if publicacao.usuario and publicacao.usuario.nome else 'C' }}
+
+                        </div>
+
+                    {% endif %}
+
+                    <div>
+
+                        <strong>
+                            {{ publicacao.usuario.nickname if publicacao.usuario else 'Cavaleiro do Santuário' }}
+                        </strong>
+
+                        {% if publicacao.data %}
+
+                            <time class="post-data"
+                                  datetime="{{ publicacao.data.isoformat() }}">
+
+                                {{ publicacao.data.strftime('%d/%m/%Y às %H:%M') }}
+
+                            </time>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- IMAGEM -->
+                <div class="post-imagem-container">
+
+                    <img
+                        class="post-imagem"
+                        src="{{ url_for('static', filename='uploads/' ~ publicacao.filename) }}"
+                        alt="Publicação de {{ publicacao.usuario.nickname if publicacao.usuario else 'Cavaleiro do Santuário' }}"
+                        loading="lazy">
+
+                </div>
+
+                <!-- LEGENDA -->
+                <div class="post-conteudo">
+
+                    {% if publicacao.legenda %}
+
+                        <p>{{ publicacao.legenda }}</p>
+
+                    {% else %}
+
+                        <p>Compartilhamento do Santuário.</p>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- EXCLUIR PUBLICAÇÃO -->
+                {% if session.get('usuario_id') == publicacao.usuario_id %}
+
+                    <div class="card-footer text-end">
+
+                        <form action="{{ url_for('excluir_imagem', id=publicacao.id) }}"
+                              method="POST"
+                              onsubmit="return confirm('Deseja excluir esta publicação?');">
+
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                Excluir publicação
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                {% endif %}
+
+            </article>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- FEED VAZIO -->
+    {% if not publicacoes and not publicacoes_usuarios %}
+
+        <div class="card text-center p-4">
+
+            <h2>Ainda não há publicações</h2>
+
+            <p>As publicações dos Cavaleiros e da comunidade aparecerão aqui.</p>
+
+            <a href="{{ url_for('galeria') }}"
+               class="btn btn-primary align-self-center">
+
+                Ir para a Galeria
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock content %}

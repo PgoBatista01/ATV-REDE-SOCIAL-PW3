@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<main class="container py-5">
+<section class="container py-5">
 
     <div class="text-center mb-4">
         <h1>Meu Perfil</h1>
@@ -63,14 +63,15 @@
                     </p>
 
                     <p>
-                        <strong>Armadura favorita:</strong>
-                        {{ usuario.armadura_favorita or 'Não informada' }}
+                        <strong>Carta favorita:</strong>
+                        {{ usuario.carta_favorita or 'Não informada' }}
                     </p>
 
                 </div>
 
             </div>
 
+            {% if not visualizar|default(false) %}
             <!-- EDITAR PERFIL -->
 
             <div class="card perfil-card mt-4">
@@ -135,17 +136,17 @@
 
                     <div class="mb-3">
 
-                        <label for="armadura_favorita" class="form-label">
-                            Armadura favorita
+                        <label for="carta_favorita" class="form-label">
+                            Carta favorita
                         </label>
 
                         <input
                             type="text"
-                            id="armadura_favorita"
-                            name="armadura_favorita"
+                            id="carta_favorita"
+                            name="carta_favorita"
                             class="form-control"
-                            value="{{ usuario.armadura_favorita or '' }}"
-                            placeholder="Ex.: Armadura de Sagitário"
+                            value="{{ usuario.carta_favorita or '' }}"
+                            placeholder="Ex.: Carta de Atena"
                         >
 
                     </div>
@@ -177,11 +178,12 @@
                 </form>
 
             </div>
+            {% endif %}
 
         </div>
 
     </div>
 
-</main>
+</section>
 
 {% endblock content %}

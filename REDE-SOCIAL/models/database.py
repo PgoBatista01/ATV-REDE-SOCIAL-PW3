@@ -29,6 +29,43 @@ class Cavaleiro(db.Model):
         self.imagem = imagem
 
 
+# TABELA DE PUBLICAÇÕES DOS CAVALEIROS
+class PublicacaoCavaleiro(db.Model):
+
+    __tablename__ = "publicacao_cavaleiro"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    cavaleiro_id = db.Column(
+        db.Integer,
+        db.ForeignKey("cavaleiro.id"),
+        nullable=False
+    )
+
+    legenda = db.Column(db.Text, nullable=False)
+    imagem = db.Column(db.String(255))
+
+    data = db.Column(
+        db.DateTime,
+        default=db.func.current_timestamp()
+    )
+
+    cavaleiro = db.relationship(
+        "Cavaleiro",
+        backref=db.backref(
+            "publicacoes",
+            lazy=True,
+            cascade="all, delete-orphan"
+        )
+    )
+
+    def __init__(self, cavaleiro_id, legenda, imagem=None):
+
+        self.cavaleiro_id = cavaleiro_id
+        self.legenda = legenda
+        self.imagem = imagem
+
+
 # TABELA DE CURIOSIDADES
 class Curiosidade(db.Model):
 
@@ -42,7 +79,7 @@ class Curiosidade(db.Model):
         self.descricao = descricao
 
 
-# TABELA DE USUARIOS
+# TABELA DE USUÁRIOS
 class Usuario(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -66,19 +103,26 @@ class Usuario(db.Model):
         self.senha = senha
 
 
-# TABELA DE IMAGENS
+# TABELA DE IMAGENS DOS USUÁRIOS
 class Imagem(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(255), unique=True, nullable=False)
     legenda = db.Column(db.Text)
-    data = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
+    data = db.Column(
+        db.DateTime,
+        default=db.func.current_timestamp()
+    )
+
+    usuario_id = db.Column(
+        db.Integer,
+        db.ForeignKey("usuario.id")
+    )
 
     usuario = db.relationship(
-        'Usuario',
-        backref=db.backref('imagens', lazy=True)
+        "Usuario",
+        backref=db.backref("imagens", lazy=True)
     )
 
     def __init__(self, filename, legenda=None, usuario_id=None):

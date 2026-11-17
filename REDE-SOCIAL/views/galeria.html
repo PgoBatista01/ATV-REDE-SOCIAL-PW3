@@ -5,51 +5,28 @@
 
 {% block content %}
 
-<div class="container py-4">
+<section class="container py-5 galeria-container">
 
     <!-- CABEÇALHO -->
 
-    <div class="text-center mb-5">
-        <h1>Galeria do Santuário</h1>
-
+    <header class="galeria-header text-center mb-5">
+        <span class="galeria-subtitulo">Comunidade do Santuário</span>
+        <h1>Galeria dos Cavaleiros</h1>
         <p>
-            Compartilhe seus momentos, imagens e experiências
-            com os outros Cavaleiros.
+            Compartilhe imagens, momentos e experiências
+            com os defensores de Atena.
         </p>
-    </div>
-
-    <!-- MENSAGENS FLASH -->
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-
-        {% for category, message in messages %}
-
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-
-                {{ message }}
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                    aria-label="Fechar">
-                </button>
-
-            </div>
-
-        {% endfor %}
-
-    {% endwith %}
+    </header>
 
     <!-- FORMULÁRIO DE PUBLICAÇÃO -->
 
-    <div class="card galeria-formulario mb-5">
-
-        <div class="card-header text-center">
-            <h3>Nova publicação</h3>
-        </div>
+    <div class="galeria-formulario card mb-5">
 
         <div class="card-body">
+
+            <h3>Compartilhar publicação</h3>
+
+            <p>Divida um momento especial com a comunidade.</p>
 
             <form
                 action="{{ url_for('galeria') }}"
@@ -57,9 +34,8 @@
                 enctype="multipart/form-data">
 
                 <div class="mb-3">
-
                     <label for="file" class="form-label">
-                        Escolha uma imagem:
+                        Imagem da publicação
                     </label>
 
                     <input
@@ -68,15 +44,12 @@
                         name="file"
                         class="form-control"
                         accept=".jpg,.jpeg,.png,.gif,.webp"
-                        required
-                    >
-
+                        required>
                 </div>
 
                 <div class="mb-3">
-
                     <label for="legenda" class="form-label">
-                        Legenda da publicação:
+                        Escreva uma legenda
                     </label>
 
                     <textarea
@@ -85,15 +58,12 @@
                         class="form-control"
                         rows="3"
                         maxlength="500"
-                        placeholder="Compartilhe algo com a comunidade..."></textarea>
-
+                        placeholder="O que deseja compartilhar?"></textarea>
                 </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">
-                        Publicar imagem
-                    </button>
-                </div>
+                <button type="submit" class="btn btn-publicar">
+                    Publicar imagem
+                </button>
 
             </form>
 
@@ -103,82 +73,113 @@
 
     <!-- PUBLICAÇÕES -->
 
-    <h2 class="text-center mb-4">Publicações dos Cavaleiros</h2>
+    <div class="galeria-titulo mb-4">
+        <h2>Publicações da comunidade</h2>
+        <p>Acompanhe os registros compartilhados pelos Cavaleiros.</p>
+    </div>
 
-    <div class="row g-4">
+    <div class="galeria-publicacoes">
 
         {% for imagem in imagens %}
 
-        <div class="col-md-6 col-lg-4">
+        <article class="galeria-post">
 
-            <div class="card post-card h-100">
+            <!-- IDENTIFICAÇÃO DO AUTOR -->
 
-                <div class="post-conteudo">
+            <div class="galeria-post-autor">
 
-                    <h5>Publicação do Santuário</h5>
-
-                </div>
-
-                <div class="post-imagem-container">
+                {% if imagem.usuario and imagem.usuario.foto_perfil %}
 
                     <img
-                        src="{{ url_for('static', filename='uploads/' + imagem.filename) }}"
-                        class="post-imagem"
-                        alt="Imagem publicada na galeria">
+                        src="{{ url_for('static', filename='uploads/' ~ imagem.usuario.foto_perfil) }}"
+                        alt="Foto de perfil"
+                        class="galeria-avatar">
+
+                {% else %}
+
+                    <div class="galeria-avatar-placeholder">
+                        {{ imagem.usuario.nome[0]|upper if imagem.usuario else 'C' }}
+                    </div>
+
+                {% endif %}
+
+                <div class="galeria-autor-info">
+
+                    <strong>
+                        {{ imagem.usuario.nome if imagem.usuario else 'Cavaleiro do Santuário' }}
+                    </strong>
+
+                    <span>
+                        @{{ imagem.usuario.nickname if imagem.usuario else 'santuario' }}
+                    </span>
 
                 </div>
 
-                <div class="post-conteudo">
+            </div>
 
-                    {% if imagem.legenda %}
-                        <p>{{ imagem.legenda }}</p>
-                    {% endif %}
+            <!-- IMAGEM -->
 
-                    {% if imagem.data %}
-                        <small class="post-data">
-                            {{ imagem.data.strftime('%d/%m/%Y às %H:%M') }}
-                        </small>
-                    {% endif %}
+            <div class="galeria-post-imagem">
 
-                </div>
+                <img
+                    src="{{ url_for('static', filename='uploads/' ~ imagem.filename) }}"
+                    alt="Publicação da comunidade">
 
-                {% if imagem.usuario_id == session.get('usuario_id') %}
+            </div>
 
-                <div class="card-footer text-end">
+            <!-- LEGENDA E DATA -->
 
-                    <form
-                        action="{{ url_for('excluir_imagem', id=imagem.id) }}"
-                        method="POST"
-                        onsubmit="return confirm('Deseja excluir esta publicação?');">
+            <div class="galeria-post-conteudo">
 
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            Excluir publicação
-                        </button>
+                {% if imagem.legenda %}
+                    <p>{{ imagem.legenda }}</p>
+                {% else %}
+                    <p class="galeria-sem-legenda">
+                        Compartilhamento do Santuário.
+                    </p>
+                {% endif %}
 
-                    </form>
-
-                </div>
-
+                {% if imagem.data %}
+                    <small>
+                        {{ imagem.data.strftime('%d/%m/%Y às %H:%M') }}
+                    </small>
                 {% endif %}
 
             </div>
 
-        </div>
+            <!-- EXCLUIR PUBLICAÇÃO -->
+
+            {% if imagem.usuario_id == session.get('usuario_id') %}
+
+            <div class="galeria-post-acoes">
+
+                <form
+                    action="{{ url_for('excluir_imagem', id=imagem.id) }}"
+                    method="POST"
+                    onsubmit="return confirm('Deseja excluir esta publicação?');">
+
+                    <button type="submit" class="btn-excluir">
+                        Excluir publicação
+                    </button>
+
+                </form>
+
+            </div>
+
+            {% endif %}
+
+        </article>
 
         {% else %}
 
-        <div class="col-12 text-center">
+        <div class="galeria-vazia text-center">
 
-            <div class="card p-5">
+            <h3>Nenhuma publicação encontrada</h3>
 
-                <h3>Nenhuma publicação ainda</h3>
-
-                <p>
-                    Seja o primeiro Cavaleiro a compartilhar
-                    uma imagem no Santuário!
-                </p>
-
-            </div>
+            <p>
+                Ainda não existem imagens compartilhadas.
+                Seja o primeiro a publicar!
+            </p>
 
         </div>
 
@@ -186,6 +187,6 @@
 
     </div>
 
-</div>
+</section>
 
 {% endblock content %}

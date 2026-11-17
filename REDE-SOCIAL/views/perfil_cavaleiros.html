@@ -1,0 +1,230 @@
+
+{% extends 'base.html' %}
+
+{% block title %}{{ cavaleiro.nome }} | Santuário Social{% endblock %}
+
+{% block content %}
+
+<section class="container py-5 perfil-cavaleiro-container">
+
+    <!-- VOLTAR -->
+    <div class="mb-4">
+        <a href="{{ url_for('feed') }}" class="btn btn-voltar-cavaleiro">
+            Voltar ao Feed
+        </a>
+    </div>
+
+    <!-- PERFIL -->
+    <article class="perfil-cavaleiro-card">
+
+        <header class="perfil-cavaleiro-banner">
+            <span>Comunidade do Santuário</span>
+            <h1>Perfil do Cavaleiro</h1>
+            <p>Conheça a história de um defensor de Atena.</p>
+        </header>
+
+        <div class="perfil-cavaleiro-conteudo">
+
+            <!-- FOTO DE PERFIL -->
+            <div class="perfil-cavaleiro-imagem">
+
+                {% set imagem_cavaleiro = cavaleiro.imagem %}
+                {% if imagem_cavaleiro and '/' not in imagem_cavaleiro %}
+                    {% set imagem_cavaleiro = 'imgs/' ~ imagem_cavaleiro %}
+                {% endif %}
+
+                {% if imagem_cavaleiro %}
+
+                    <img
+                        src="{{ url_for('static', filename=imagem_cavaleiro) }}"
+                        alt="{{ cavaleiro.nome }}">
+
+                {% else %}
+
+                    <div class="perfil-cavaleiro-sem-imagem">
+                        {{ cavaleiro.nome[0]|upper }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+            <!-- NOME -->
+            <h2>{{ cavaleiro.nome }}</h2>
+
+            <span class="perfil-cavaleiro-categoria">
+                {{ cavaleiro.categoria or 'Cavaleiro do Santuário' }}
+            </span>
+
+            <!-- INFORMACOES -->
+            <div class="perfil-cavaleiro-informacoes">
+
+                <div class="perfil-info-item">
+                    <h3>Constelação</h3>
+                    <p>{{ cavaleiro.constelacao or 'Não informada' }}</p>
+                </div>
+
+                <div class="perfil-info-item">
+                    <h3>Armadura</h3>
+                    <p>{{ cavaleiro.armadura or 'Não informada' }}</p>
+                </div>
+
+                <div class="perfil-info-item">
+                    <h3>Poder</h3>
+                    <p>{{ cavaleiro.poder or 'Não informado' }}</p>
+                </div>
+
+                <div class="perfil-info-item">
+                    <h3>Categoria</h3>
+                    <p>{{ cavaleiro.categoria or 'Não informada' }}</p>
+                </div>
+
+            </div>
+
+            <!-- DESCRICAO -->
+            <div class="perfil-cavaleiro-descricao">
+
+                <h3>História e descrição</h3>
+
+                <p>
+                    {{ cavaleiro.descricao or 'Nenhuma descrição cadastrada para este Cavaleiro.' }}
+                </p>
+
+            </div>
+
+            <!-- BOTOES -->
+            <div class="perfil-cavaleiro-botoes">
+
+                <a href="{{ url_for('enciclopedia') }}" class="btn btn-enciclopedia">
+                    Ver enciclopédia
+                </a>
+
+                <a href="{{ url_for('feed') }}" class="btn btn-voltar-cavaleiro">
+                    Voltar ao Feed
+                </a>
+
+            </div>
+
+        </div>
+
+    </article>
+
+    <!-- PUBLICAÇÕES DO CAVALEIRO -->
+    <section class="mt-5">
+
+        <div class="text-center mb-4">
+            <h2>Publicações de {{ cavaleiro.nome }}</h2>
+            <p>Acompanhe os registros deste Cavaleiro no Santuário.</p>
+        </div>
+
+        {% if publicacoes %}
+
+            <div class="row g-4">
+
+                {% for publicacao in publicacoes %}
+
+                    <div class="col-12 col-md-6 col-lg-4">
+
+                        <article class="post-card h-100">
+
+                            <!-- CABEÇALHO -->
+                            <div class="post-conteudo d-flex align-items-center gap-3">
+
+                                {% if cavaleiro.imagem %}
+
+                                    <img
+                                        src="{{ url_for('static', filename=cavaleiro.imagem) }}"
+                                        alt="{{ cavaleiro.nome }}"
+                                        width="45"
+                                        height="45"
+                                        class="rounded-circle"
+                                        style="object-fit: cover">
+
+                                {% else %}
+
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width:45px;height:45px;background:#192F4F;color:#F5D982;font-weight:bold">
+
+                                        {{ cavaleiro.nome[0]|upper }}
+
+                                    </div>
+
+                                {% endif %}
+
+                                <div>
+                                    <strong>{{ cavaleiro.nome }}</strong>
+
+                                    <div class="post-data">
+                                        Cavaleiro do Santuário
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- IMAGEM DA PUBLICAÇÃO -->
+                            {% if publicacao.imagem %}
+
+                                <div class="post-imagem-container">
+
+                                    <img
+                                        src="{{ url_for('static', filename=publicacao.imagem) }}"
+                                        alt="Publicação de {{ cavaleiro.nome }}"
+                                        class="post-imagem"
+                                        loading="lazy">
+
+                                </div>
+
+                            {% endif %}
+
+                            <!-- LEGENDA -->
+                            <div class="post-conteudo">
+
+                                <p>{{ publicacao.legenda }}</p>
+
+                                {% if publicacao.data %}
+
+                                    <time class="post-data"
+                                          datetime="{{ publicacao.data.isoformat() }}">
+
+                                        {{ publicacao.data.strftime('%d/%m/%Y às %H:%M') }}
+
+                                    </time>
+
+                                {% endif %}
+
+                            </div>
+
+                        </article>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="card text-center p-4">
+
+                <h3>Nenhuma publicação ainda</h3>
+
+                <p>
+                    Este Cavaleiro ainda não compartilhou publicações no Santuário.
+                </p>
+
+                <a href="{{ url_for('feed') }}"
+                   class="btn btn-primary align-self-center">
+
+                    Voltar ao Feed
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</section>
+
+{% endblock content %}

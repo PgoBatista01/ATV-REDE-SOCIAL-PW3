@@ -1,51 +1,119 @@
+{% extends 'base.html' %}
 
-.casa-card {
-    height: 100%;
-    overflow: hidden;
-    border: 1px solid #d4af37;
-    border-radius: 15px;
-    background-color: #fff;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+{% block title %}Doze Casas do Zodíaco | Santuário Social{% endblock %}
 
-.casa-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.2);
-}
+{% block content %}
 
-.casa-imagem-container {
-    width: 100%;
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f4f5ed;
-    padding: 10px;
-}
+<section class="container py-5">
 
-.casa-imagem {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
+    <!-- CABEÇALHO -->
 
-.casa-card .card-body {
-    padding: 20px;
-}
+    <header class="text-center mb-5">
 
-.casa-card h3 {
-    color: #1e3a8a;
-    font-weight: bold;
-}
+        <h1>As Doze Casas do Zodíaco</h1>
 
-.casa-card h5 {
-    color: #b08d27;
-    margin-bottom: 15px;
-}
+        <p class="mt-3">
+            Atravesse os doze templos do Santuário de Atena
+            e conheça os lendários Cavaleiros de Ouro.
+        </p>
 
-.casa-numero {
-    display: inline-block;
-    color: #1e3a8a;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
+        <hr>
+
+    </header>
+
+    <!-- APRESENTAÇÃO -->
+
+    <section class="text-center mb-5">
+
+        <img
+            src="{{ url_for('static', filename='imgs/santuario.jpg') }}"
+            alt="Santuário de Atena"
+            class="img-fluid casas-banner"
+        >
+
+        <p class="mt-4">
+            As Doze Casas representam o caminho até o Templo
+            de Atena. Cada uma é protegida por um Cavaleiro de Ouro,
+            responsável por defender seu templo.
+        </p>
+
+    </section>
+
+    <!-- DOZE CASAS -->
+
+    {% set casas = [
+        ('Áries', 'Mu de Áries', 'mu.png', 'Guardião da primeira casa, conhecido por sua habilidade em reparar armaduras.'),
+        ('Touro', 'Aldebaran de Touro', 'aldebaran.png', 'Guardião da segunda casa, reconhecido por sua força e resistência.'),
+        ('Gêmeos', 'Saga de Gêmeos', 'saga.png', 'Guardião da terceira casa, conhecido por seu enorme poder.'),
+        ('Câncer', 'Máscara da Morte de Câncer', 'mascara-da-morte.png', 'Guardião da quarta casa, associado ao poder espiritual.'),
+        ('Leão', 'Aiolia de Leão', 'aiolia.png', 'Guardião da quinta casa, conhecido por sua velocidade e coragem.'),
+        ('Virgem', 'Shaka de Virgem', 'shaka.png', 'Guardião da sexta casa, considerado um dos Cavaleiros mais poderosos.'),
+        ('Libra', 'Dohko de Libra', 'dohko.png', 'Guardião da sétima casa, mestre experiente e sábio.'),
+        ('Escorpião', 'Milo de Escorpião', 'milo.png', 'Guardião da oitava casa, usuário da técnica Agulha Escarlate.'),
+        ('Sagitário', 'Aiolos de Sagitário', 'aiolos.png', 'Guardião da nona casa, conhecido por sua lealdade a Atena.'),
+        ('Capricórnio', 'Shura de Capricórnio', 'shura.png', 'Guardião da décima casa, usuário da técnica Excalibur.'),
+        ('Aquário', 'Camus de Aquário', 'camus.png', 'Guardião da décima primeira casa, mestre das técnicas de gelo.'),
+        ('Peixes', 'Afrodite de Peixes', 'afrodite.png', 'Guardião da décima segunda casa, conhecido por suas rosas especiais.')
+    ] %}
+
+    <section class="row g-4">
+
+        {% for signo, cavaleiro, imagem, descricao in casas %}
+
+            <div class="col-md-6 col-lg-4">
+
+                <article class="card casa-card h-100">
+
+                    <div class="casa-numero">
+                        {{ loop.index }}ª Casa
+                    </div>
+
+                    <div class="casa-imagem-container">
+
+                        <img
+                            src="{{ url_for('static', filename='imgs/' + imagem) }}"
+                            alt="{{ cavaleiro }}"
+                            class="casa-imagem"
+                            loading="lazy"
+                        >
+
+                    </div>
+
+                    <div class="card-body text-center">
+
+                        <h3>{{ signo }}</h3>
+
+                        <h5>{{ cavaleiro }}</h5>
+
+                        <p>{{ descricao }}</p>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        {% endfor %}
+
+    </section>
+
+    <!-- FINAL -->
+
+    <section class="text-center casas-final mt-5">
+
+        <h2>O caminho até Atena</h2>
+
+        <p>
+            Cada templo guarda uma história e um poderoso guardião.
+            Conheça os Cavaleiros e explore todo o universo do Santuário.
+        </p>
+
+        <a href="{{ url_for('enciclopedia') }}" class="btn btn-primary mt-2">
+            Conhecer os Cavaleiros
+        </a>
+
+    </section>
+
+</section>
+
+{% endblock content %}

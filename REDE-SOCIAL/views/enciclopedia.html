@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<div class="container py-4">
+<section class="container enciclopedia">
 
     <div class="text-center mb-5">
         <h1>Enciclopédia do Santuário</h1>
@@ -17,120 +17,327 @@
 
     <!-- CAVALEIROS DE BRONZE -->
 
-    <h2 class="mb-4">Cavaleiros de Bronze</h2>
+    <h2 class="titulo-secao">Cavaleiros de Bronze</h2>
 
     <div class="row g-4 mb-5">
 
-        {% set bronze = [
-            ('Seiya de Pégaso', 'Pégaso', 'Bronze', 'Meteoro de Pégaso', 'Um dos principais protagonistas da história, conhecido por sua determinação e coragem.', 'seiya.png'),
-            ('Shiryu de Dragão', 'Dragão', 'Bronze', 'Cólera do Dragão', 'Um cavaleiro conhecido por sua sabedoria, disciplina e espírito de justiça.', 'shiryu.png'),
-            ('Hyoga de Cisne', 'Cisne', 'Bronze', 'Pó de Diamante', 'Um cavaleiro que utiliza técnicas relacionadas ao gelo e às baixas temperaturas.', 'hyoga.png'),
-            ('Shun de Andrômeda', 'Andrômeda', 'Bronze', 'Corrente de Andrômeda', 'Um cavaleiro gentil que utiliza correntes especiais em suas batalhas.', 'shun.png'),
-            ('Ikki de Fênix', 'Fênix', 'Bronze', 'Ave Fênix', 'Um cavaleiro de personalidade forte, conhecido por seu poder e resistência.', 'ikki.png')
-        ] %}
-
-        {% for nome, constelacao, armadura, tecnica, descricao, imagem in bronze %}
-
+        <!-- SEIYA -->
         <div class="col-md-6 col-lg-4">
-            <div class="card cavaleiro-card h-100">
-
-                <img
-                    src="{{ url_for('static', filename='imgs/' + imagem) }}"
-                    class="card-img-top"
-                    alt="{{ nome }}"
-                >
-
-                <div class="card-body">
-                    <h3>{{ nome }}</h3>
-
-                    <p>{{ descricao }}</p>
-
-                    <p><strong>Constelação:</strong> {{ constelacao }}</p>
-                    <p><strong>Armadura:</strong> {{ armadura }}</p>
-                    <p><strong>Técnica:</strong> {{ tecnica }}</p>
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">Cavaleiro de Bronze</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/seiya.png') }}" alt="Seiya de Pégaso">
                 </div>
-
+                <div class="card-body">
+                    <h3>Pégaso</h3>
+                    <h5>Seiya de Pégaso</h5>
+                    <p>Um dos principais protagonistas da história, conhecido por sua determinação e coragem.</p>
+                    <p><strong>Constelação:</strong> Pégaso</p>
+                    <p><strong>Armadura:</strong> Bronze</p>
+                    <p><strong>Técnica:</strong> Meteoro de Pégaso</p>
+                </div>
             </div>
         </div>
 
-        {% endfor %}
+        <!-- SHIRYU -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">Cavaleiro de Bronze</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/shiryu.png') }}" alt="Shiryu de Dragão">
+                </div>
+                <div class="card-body">
+                    <h3>Dragão</h3>
+                    <h5>Shiryu de Dragão</h5>
+                    <p>Conhecido por sua sabedoria, disciplina e espírito de justiça.</p>
+                    <p><strong>Constelação:</strong> Dragão</p>
+                    <p><strong>Armadura:</strong> Bronze</p>
+                    <p><strong>Técnica:</strong> Cólera do Dragão</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- HYOGA -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">Cavaleiro de Bronze</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/hyoga.png') }}" alt="Hyoga de Cisne">
+                </div>
+                <div class="card-body">
+                    <h3>Cisne</h3>
+                    <h5>Hyoga de Cisne</h5>
+                    <p>Utiliza técnicas relacionadas ao gelo e às baixas temperaturas.</p>
+                    <p><strong>Constelação:</strong> Cisne</p>
+                    <p><strong>Armadura:</strong> Bronze</p>
+                    <p><strong>Técnica:</strong> Pó de Diamante</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SHUN -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">Cavaleiro de Bronze</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/shun.png') }}" alt="Shun de Andrômeda">
+                </div>
+                <div class="card-body">
+                    <h3>Andrômeda</h3>
+                    <h5>Shun de Andrômeda</h5>
+                    <p>Um cavaleiro gentil que utiliza correntes especiais em suas batalhas.</p>
+                    <p><strong>Constelação:</strong> Andrômeda</p>
+                    <p><strong>Armadura:</strong> Bronze</p>
+                    <p><strong>Técnica:</strong> Corrente de Andrômeda</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- IKKI -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">Cavaleiro de Bronze</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/ikki.png') }}" alt="Ikki de Fênix">
+                </div>
+                <div class="card-body">
+                    <h3>Fênix</h3>
+                    <h5>Ikki de Fênix</h5>
+                    <p>Um cavaleiro de personalidade forte, conhecido por seu poder e resistência.</p>
+                    <p><strong>Constelação:</strong> Fênix</p>
+                    <p><strong>Armadura:</strong> Bronze</p>
+                    <p><strong>Técnica:</strong> Ave Fênix</p>
+                </div>
+            </div>
+        </div>
 
     </div>
 
     <!-- CAVALEIROS DE OURO -->
 
-    <h2 class="mb-4">Cavaleiros de Ouro</h2>
+    <h2 class="titulo-secao">Cavaleiros de Ouro</h2>
 
     <div class="row g-4 mb-5">
 
-        {% set dourados = [
-            ('Mu de Áries', 'Áries', 'mu.png'),
-            ('Aldebaran de Touro', 'Touro', 'aldebaran.png'),
-            ('Saga de Gêmeos', 'Gêmeos', 'saga.png'),
-            ('Máscara da Morte de Câncer', 'Câncer', 'mascara-da-morte.png'),
-            ('Aiolia de Leão', 'Leão', 'aiolia.png'),
-            ('Shaka de Virgem', 'Virgem', 'shaka.png'),
-            ('Dohko de Libra', 'Libra', 'dohko.png'),
-            ('Milo de Escorpião', 'Escorpião', 'milo.png'),
-            ('Aiolos de Sagitário', 'Sagitário', 'aiolos.png'),
-            ('Shura de Capricórnio', 'Capricórnio', 'shura.png'),
-            ('Camus de Aquário', 'Aquário', 'camus.png'),
-            ('Afrodite de Peixes', 'Peixes', 'afrodite.png')
-        ] %}
-
-        {% for nome, constelacao, imagem in dourados %}
-
+        <!-- ÁRIES -->
         <div class="col-md-6 col-lg-4">
-            <div class="card cavaleiro-card h-100">
-
-                <img
-                    src="{{ url_for('static', filename='imgs/' + imagem) }}"
-                    class="card-img-top"
-                    alt="{{ nome }}"
-                >
-
-                <div class="card-body text-center">
-                    <h3>{{ nome }}</h3>
-
-                    <p>
-                        Guardião da Casa de {{ constelacao }}.
-                    </p>
-
-                    <p>
-                        <strong>Constelação:</strong>
-                        {{ constelacao }}
-                    </p>
-
-                    <p>
-                        <strong>Armadura:</strong>
-                        Ouro
-                    </p>
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">1ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/mu.png') }}" alt="Mu de Áries">
                 </div>
-
+                <div class="card-body">
+                    <h3>Áries</h3>
+                    <h5>Mu de Áries</h5>
+                    <p>Guardião da primeira casa, conhecido por sua habilidade em reparar armaduras.</p>
+                    <p><strong>Constelação:</strong> Áries</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
             </div>
         </div>
 
-        {% endfor %}
+        <!-- TOURO -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">2ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/aldebaran.png') }}" alt="Aldebaran de Touro">
+                </div>
+                <div class="card-body">
+                    <h3>Touro</h3>
+                    <h5>Aldebaran de Touro</h5>
+                    <p>Guardião da segunda casa, reconhecido por sua força e resistência.</p>
+                    <p><strong>Constelação:</strong> Touro</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- GÊMEOS -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">3ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/saga.png') }}" alt="Saga de Gêmeos">
+                </div>
+                <div class="card-body">
+                    <h3>Gêmeos</h3>
+                    <h5>Saga de Gêmeos</h5>
+                    <p>Guardião da terceira casa, conhecido por seu enorme poder.</p>
+                    <p><strong>Constelação:</strong> Gêmeos</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CÂNCER -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">4ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/mascara-da-morte.png') }}" alt="Máscara da Morte de Câncer">
+                </div>
+                <div class="card-body">
+                    <h3>Câncer</h3>
+                    <h5>Máscara da Morte</h5>
+                    <p>Guardião da quarta casa do Santuário.</p>
+                    <p><strong>Constelação:</strong> Câncer</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEÃO -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">5ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/aiolia.png') }}" alt="Aiolia de Leão">
+                </div>
+                <div class="card-body">
+                    <h3>Leão</h3>
+                    <h5>Aiolia de Leão</h5>
+                    <p>Conhecido por sua coragem, velocidade e lealdade.</p>
+                    <p><strong>Constelação:</strong> Leão</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIRGEM -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">6ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/shaka.png') }}" alt="Shaka de Virgem">
+                </div>
+                <div class="card-body">
+                    <h3>Virgem</h3>
+                    <h5>Shaka de Virgem</h5>
+                    <p>Conhecido como o homem mais próximo de Deus.</p>
+                    <p><strong>Constelação:</strong> Virgem</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIBRA -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">7ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/dohko.png') }}" alt="Dohko de Libra">
+                </div>
+                <div class="card-body">
+                    <h3>Libra</h3>
+                    <h5>Dohko de Libra</h5>
+                    <p>Um sábio Cavaleiro de Ouro, guardião da sétima casa.</p>
+                    <p><strong>Constelação:</strong> Libra</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESCORPIÃO -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">8ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/milo.png') }}" alt="Milo de Escorpião">
+                </div>
+                <div class="card-body">
+                    <h3>Escorpião</h3>
+                    <h5>Milo de Escorpião</h5>
+                    <p>Guardião da oitava casa, conhecido pela Agulha Escarlate.</p>
+                    <p><strong>Constelação:</strong> Escorpião</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAGITÁRIO -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">9ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/aiolos.png') }}" alt="Aiolos de Sagitário">
+                </div>
+                <div class="card-body">
+                    <h3>Sagitário</h3>
+                    <h5>Aiolos de Sagitário</h5>
+                    <p>Um Cavaleiro lembrado por sua coragem e lealdade.</p>
+                    <p><strong>Constelação:</strong> Sagitário</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CAPRICÓRNIO -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">10ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/shura.png') }}" alt="Shura de Capricórnio">
+                </div>
+                <div class="card-body">
+                    <h3>Capricórnio</h3>
+                    <h5>Shura de Capricórnio</h5>
+                    <p>Conhecido por dominar a técnica Excalibur.</p>
+                    <p><strong>Constelação:</strong> Capricórnio</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AQUÁRIO -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">11ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/camus.png') }}" alt="Camus de Aquário">
+                </div>
+                <div class="card-body">
+                    <h3>Aquário</h3>
+                    <h5>Camus de Aquário</h5>
+                    <p>O mestre das técnicas relacionadas ao gelo.</p>
+                    <p><strong>Constelação:</strong> Aquário</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PEIXES -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card enciclopedia-card h-100">
+                <div class="card-header">12ª Casa</div>
+                <div class="imagem-cavaleiro">
+                    <img src="{{ url_for('static', filename='imgs/afrodite.png') }}" alt="Afrodite de Peixes">
+                </div>
+                <div class="card-body">
+                    <h3>Peixes</h3>
+                    <h5>Afrodite de Peixes</h5>
+                    <p>Guardião da última casa do Zodíaco, conhecido por suas rosas.</p>
+                    <p><strong>Constelação:</strong> Peixes</p>
+                    <p><strong>Armadura:</strong> Ouro</p>
+                </div>
+            </div>
+        </div>
 
     </div>
 
-    <!-- INFORMAÇÕES -->
+    <!-- FINAL -->
 
-    <div class="cosmo-card text-center mt-4">
-
+    <div class="cosmo-card text-center mt-5">
         <h2>Conhecimento é poder</h2>
-
         <p>
-            Continue explorando o Santuário, conhecendo os cavaleiros
+            Continue explorando o Santuário, conhecendo os Cavaleiros
             e descobrindo os mistérios das doze constelações.
         </p>
-
         <a href="{{ url_for('casas') }}" class="btn btn-primary mt-2">
             Conhecer as Doze Casas
         </a>
-
     </div>
 
-</div>
+</section>
 
 {% endblock content %}
