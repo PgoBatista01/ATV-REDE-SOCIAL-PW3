@@ -10,6 +10,7 @@ from flask_socketio import SocketIO
 
 from models.database import Cavaleiro, PublicacaoCavaleiro, db
 from controllers import chat, routes
+from controllers.personagens_ia import personagens_ia_bp
 from controllers.desafios import desafios_bp
 from controllers.perfil import perfil_bp
 from controllers.curtidas import curtidas_bp
@@ -41,6 +42,7 @@ routes.init_app(app)
 app.register_blueprint(desafios_bp)
 app.register_blueprint(perfil_bp)
 app.register_blueprint(curtidas_bp)
+app.register_blueprint(personagens_ia_bp)
 chat.init_app(socketio)
 
 

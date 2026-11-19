@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}{{ personagem.nome }} | Santuário Social{% endblock %}
+{% block content %}
+<section class="ia-shell">
+  <p><a href="{{ url_for('personagens_ia.lista_personagens') }}" class="link-warning">← Voltar aos personagens</a></p>
+  <div class="ia-chat">
+    <header class="ia-chat-top">
+      <img src="{{ url_for('static', filename='imgs/' ~ personagem.imagem) }}" alt="{{ personagem.nome }}">
+      <div><span class="ia-tag">{{ personagem.grupo }}</span><h2>{{ personagem.nome }}</h2><p>{{ personagem.posto }}</p></div>
+    </header>
+    <div class="ia-mensagens" id="ia-mensagens" aria-live="polite">
+      <div class="ia-balao bot">Saudações! Sou {{ personagem.nome }}. {{ personagem.bio }} O que deseja conversar?</div>
+    </div>
+    <form class="ia-form" id="ia-form">
+      <input class="form-control" id="ia-entrada" maxlength="1200" autocomplete="off" placeholder="Escreva sua mensagem..." required>
+      <button class="btn btn-warning" id="ia-enviar" type="submit">Enviar</button>
+    </form>
+    <div class="ia-aviso">A conversa usa uma personalidade própria e mantém separadas as continuidades. O histórico recente fica nesta sessão do navegador.</div>
+  </div>
+</section>
+<script>
+(() => {
+ const form=document.getElementById('ia-form');
+ const entrada=document.getElementById('ia-entrada');
+ const mensagens=document.getElementById('ia-mensagens');
+ const botao=document.getElementById('ia-enviar');
+ const endpoint={{ url_for('personagens_ia.enviar_mensagem', slug=personagem.slug)|tojson }};
+ function bolha(texto,tipo){
+  const el=document.createElement('div');
+  el.className='ia-balao '+tipo;
+  el.textContent=texto;
+  mensagens.appendChild(el);
+  mensagens.scrollTop=mensagens.scrollHeight;
+ }
+ form.addEventListener('submit',async event=>{
+  event.preventDefault();
+  const texto=entrada.value.trim();
+  if(!texto)return;
+  bolha(texto,'user'); entrada.value=''; entrada.disabled=true; botao.disabled=true; botao.textContent='...';
+  try{
+   const resposta=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensagem:texto})});
+   const dados=await resposta.json();
+   if(!resposta.ok)throw new Error(dados.erro||'Não foi possível enviar a mensagem.');
+   bolha(dados.resposta,'bot');
+  }catch(erro){bolha(erro.message,'bot');}
+  finally{entrada.disabled=false;botao.disabled=false;botao.textContent='Enviar';entrada.focus();}
+ });
+})();
+</script>
+{% endblock %}

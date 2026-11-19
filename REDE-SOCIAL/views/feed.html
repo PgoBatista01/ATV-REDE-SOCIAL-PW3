@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<section class="container py-4">
+<section class="container py-4 feed-social">
 
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
@@ -18,6 +18,16 @@
         </a>
     </div>
 
+    <div class="feed-stories" aria-label="Personagens em destaque">
+      <a href="{{ url_for('personagens_ia.perfil_personagem', slug='athena') }}"><span class="story-ring"><img src="{{ url_for('static', filename='imgs/atena.png') }}" alt=""></span><small>Atena</small></a>
+      <a href="{{ url_for('personagens_ia.perfil_personagem', slug='seiya') }}"><span class="story-ring"><img src="{{ url_for('static', filename='imgs/seiya.png') }}" alt=""></span><small>Seiya</small></a>
+      <a href="{{ url_for('personagens_ia.perfil_personagem', slug='shiryu') }}"><span class="story-ring"><img src="{{ url_for('static', filename='imgs/shiryu.png') }}" alt=""></span><small>Shiryu</small></a>
+      <a href="{{ url_for('personagens_ia.perfil_personagem', slug='hyoga') }}"><span class="story-ring"><img src="{{ url_for('static', filename='imgs/hyoga.png') }}" alt=""></span><small>Hyoga</small></a>
+      <a href="{{ url_for('personagens_ia.perfil_personagem', slug='shun') }}"><span class="story-ring"><img src="{{ url_for('static', filename='imgs/shun.png') }}" alt=""></span><small>Shun</small></a>
+      <a href="{{ url_for('personagens_ia.perfil_personagem', slug='ikki') }}"><span class="story-ring"><img src="{{ url_for('static', filename='imgs/ikki.png') }}" alt=""></span><small>Ikki</small></a>
+      <a href="{{ url_for('personagens_ia.perfil_personagem', slug='shion') }}"><span class="story-ring"><img src="{{ url_for('static', filename='imgs/mu.png') }}" alt=""></span><small>Shion</small></a>
+      <a class="story-all" href="{{ url_for('personagens_ia.lista_personagens') }}"><span class="story-ring story-plus">＋</span><small>Todos</small></a>
+    </div>
     <!-- PUBLICAÇÕES DOS CAVALEIROS -->
     {% if publicacoes %}
 

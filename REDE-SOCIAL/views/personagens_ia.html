@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Personagens IA | Santuário Social{% endblock %}
+{% block content %}
+<section class="ia-shell">
+  <header class="ia-heading">
+    <span class="ia-tag">SANTUÁRIO SOCIAL • COSMO CONECTADO</span>
+    <h1>Conheça os personagens</h1>
+    <p>Visite perfis individuais e converse com versões de IA dos cavaleiros e deuses de cada continuidade.</p>
+  </header>
+  <div class="ia-filtros">
+    <input id="busca-personagem" class="form-control" type="search" placeholder="Buscar personagem..." aria-label="Buscar personagem">
+    <select id="filtro-grupo" class="form-select" aria-label="Filtrar por saga">
+      <option value="">Todas as sagas e continuidades</option>
+      {% for grupo in grupos %}<option value="{{ grupo }}">{{ grupo }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="ia-grid" id="grade-personagens">
+    {% for p in personagens %}
+    <article class="ia-personagem" data-nome="{{ p.nome|lower }}" data-grupo="{{ p.grupo }}">
+      <img src="{{ url_for('static', filename='imgs/' ~ p.imagem) }}" alt="{{ p.nome }}" loading="lazy">
+      <div class="ia-personagem-info">
+        <span class="ia-tag">{{ p.grupo }}</span>
+        <span class="ia-tag">{{ p.posto }}</span>
+        <h3>{{ p.nome }}</h3>
+        <p>{{ p.bio }}</p>
+        <a class="btn btn-outline-warning w-100" href="{{ url_for('personagens_ia.perfil_personagem', slug=p.slug) }}">Visitar perfil e conversar</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  <p id="sem-personagens" class="text-center mt-4 text-light" hidden>Nenhum personagem encontrado.</p>
+</section>
+<script>
+(() => {
+ const busca=document.getElementById('busca-personagem');
+ const grupo=document.getElementById('filtro-grupo');
+ const cards=[...document.querySelectorAll('.ia-personagem')];
+ const vazio=document.getElementById('sem-personagens');
+ function filtrar(){
+  const termo=busca.value.trim().toLocaleLowerCase('pt-BR');
+  let visiveis=0;
+  cards.forEach(card=>{
+   const okNome=card.dataset.nome.includes(termo);
+   const okGrupo=!grupo.value||card.dataset.grupo===grupo.value;
+   card.hidden=!(okNome&&okGrupo);
+   if(!card.hidden)visiveis++;
+  });
+  vazio.hidden=visiveis!==0;
+ }
+ busca.addEventListener('input',filtrar);
+ grupo.addEventListener('change',filtrar);
+})();
+</script>
+{% endblock %}

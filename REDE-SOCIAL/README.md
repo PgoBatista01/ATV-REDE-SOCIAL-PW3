@@ -52,3 +52,17 @@ Abra `http://localhost:5000`. Na primeira execução, `app.py` cria a base de da
 - A galeria guarda imagens em `static/uploads` e permite que cada utilizador apague apenas as próprias publicações.
 - O feed mostra as publicações dos Cavaleiros (`PublicacaoCavaleiro`) e as imagens partilhadas pelos utilizadores (`Imagem`).
 - As curtidas são apenas temporárias na sessão; o projeto não possui tabelas `Post` ou `Curtida`.
+
+
+## Personagens com IA
+
+A página `/personagens-ia` reúne perfis individuais dos Cavaleiros de Bronze, Atena, Shion como Grande Mestre vivo nesta experiência e personagens de The Lost Canvas, Omega, Soul of Gold, Saintia Shō, Episode G/Assassin e filmes/continuidades não canônicas. Cada perfil tem instruções de personalidade e continuidade separadas.
+
+Para ativar as respostas de IA, configure no ambiente do servidor `OPENAI_API_KEY`. Opcionalmente, configure `OPENAI_MODEL` (padrão `gpt-4o-mini`) e `OPENAI_BASE_URL` (padrão `https://api.openai.com/v1`) para um endpoint compatível com Chat Completions. Exemplo PowerShell:
+
+```powershell
+$env:OPENAI_API_KEY = "sua-chave-da-api"
+$env:OPENAI_MODEL = "gpt-4o-mini"
+```
+
+A chave fica somente no servidor e nunca deve ser colocada no JavaScript ou commitada no Git. Sem a chave, o catálogo e os perfis funcionam, mas as respostas de IA ficam desativadas. O histórico recente de cada personagem é mantido na sessão do navegador, não como histórico permanente no MySQL.
