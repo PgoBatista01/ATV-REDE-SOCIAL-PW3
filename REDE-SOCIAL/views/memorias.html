@@ -1,0 +1,130 @@
+
+{% extends "base.html" %}
+
+{% block title %}Memórias do Santuário | Santuário de Atena{% endblock %}
+
+{% block content %}
+
+<section class="container py-5">
+
+    <header class="text-center mb-5">
+        <h1>Memórias do Santuário</h1>
+        <p>
+            Relembre a infância dos Cavaleiros e conheça momentos
+            especiais de suas histórias.
+        </p>
+    </header>
+
+    <!-- CARROSSEL DE MEMÓRIAS INICIAIS -->
+    {% if memorias_iniciais %}
+
+    <div id="carrosselMemorias" class="carousel slide mb-5"
+         data-bs-ride="carousel">
+
+        <div class="carousel-inner rounded">
+
+            {% for memoria in memorias_iniciais %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+
+                <img
+                    src="{{ url_for('static', filename='imgs/' ~ memoria.imagem) }}"
+                    class="d-block w-100"
+                    alt="{{ memoria.nome }}"
+                    style="height: 450px; object-fit: cover;"
+                >
+
+                <div class="carousel-caption d-block">
+                    <h3>{{ memoria.nome }}</h3>
+                    <p>{{ memoria.legenda }}</p>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <button class="carousel-control-prev" type="button"
+                data-bs-target="#carrosselMemorias"
+                data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+
+        <button class="carousel-control-next" type="button"
+                data-bs-target="#carrosselMemorias"
+                data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+            <span class="visually-hidden">Próxima</span>
+        </button>
+
+    </div>
+
+    {% endif %}
+
+    <!-- PUBLICAÇÕES DO MESTRE -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Novas memórias</h2>
+
+        {% if usuario and usuario.tipo_usuario == 'mestre' %}
+        <a href="{{ url_for('publicar_memoria') }}"
+           class="btn btn-primary">
+            Publicar memória
+        </a>
+        {% endif %}
+    </div>
+
+    {% if publicacoes %}
+
+    <div class="row g-4">
+
+        {% for publicacao in publicacoes %}
+        <div class="col-md-6 col-lg-4">
+
+            <article class="card h-100 shadow-sm">
+
+                {% if publicacao.imagem %}
+                <img
+                    src="{{ url_for('static', filename='uploads/' ~ publicacao.imagem) }}"
+                    class="card-img-top"
+                    alt="Memória de {{ publicacao.cavaleiro.nome }}"
+                    style="height: 250px; object-fit: cover;"
+                >
+                {% endif %}
+
+                <div class="card-body">
+
+                    <h5 class="card-title">
+                        {{ publicacao.cavaleiro.nome }}
+                    </h5>
+
+                    <p class="card-text">
+                        {{ publicacao.legenda }}
+                    </p>
+
+                    {% if publicacao.data %}
+                    <small class="text-muted">
+                        Publicado em {{ publicacao.data.strftime('%d/%m/%Y') }}
+                    </small>
+                    {% endif %}
+
+                </div>
+
+            </article>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="text-center py-5">
+        <h4>Nenhuma memória publicada ainda.</h4>
+        <p>Em breve, novas lembranças estarão disponíveis.</p>
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

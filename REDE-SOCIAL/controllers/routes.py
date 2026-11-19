@@ -40,8 +40,6 @@ EXTENSOES_IMAGEM = {"png", "jpg", "jpeg", "gif", "webp"}
 
 # USUÁRIO ATUAL
 def obter_usuario_atual():
-    """Devolve o usuário atual da sessão."""
-
     usuario_id = session.get("usuario_id")
 
     if usuario_id is None:
@@ -49,7 +47,6 @@ def obter_usuario_atual():
 
     try:
         usuario_id = int(usuario_id)
-
     except (TypeError, ValueError):
         session.pop("usuario_id", None)
         session.pop("usuario_nome", None)
@@ -64,9 +61,16 @@ def obter_usuario_atual():
     return usuario
 
 
+# VERIFICAR MESTRE DO SANTUÁRIO
+def usuario_e_mestre(usuario):
+    return (
+        usuario is not None
+        and getattr(usuario, "tipo_usuario", "usuario") == "mestre"
+    )
+
+
 # VALIDAR EXTENSÃO DA IMAGEM
 def extensao_imagem_permitida(filename):
-
     nome_seguro = secure_filename(filename or "")
 
     return bool(
@@ -78,8 +82,6 @@ def extensao_imagem_permitida(filename):
 
 # GUARDAR IMAGEM
 def guardar_imagem(upload, prefixo="imagem"):
-    """Guarda uma imagem na pasta static/uploads."""
-
     if upload is None or not upload.filename:
         return None
 
@@ -100,7 +102,6 @@ def guardar_imagem(upload, prefixo="imagem"):
             current_app.static_folder or "static",
             "uploads"
         )
-
         current_app.config["UPLOAD_FOLDER"] = pasta
 
     os.makedirs(pasta, exist_ok=True)
@@ -121,7 +122,6 @@ def init_app(app):
     # INÍCIO
     @app.route("/")
     def index():
-
         cavaleiros = Cavaleiro.query.order_by(
             Cavaleiro.id.asc()
         ).limit(6).all()
@@ -151,21 +151,18 @@ def init_app(app):
             confirmar = request.form.get("confirmar_senha", "")
 
             if not all((nome, nickname, email, senha)):
-
                 flash(
                     "Preencha todos os campos obrigatórios.",
                     "danger"
                 )
 
             elif len(senha) < 8:
-
                 flash(
                     "A senha deve ter pelo menos 8 caracteres.",
                     "warning"
                 )
 
             elif confirmar and senha != confirmar:
-
                 flash(
                     "As senhas não coincidem.",
                     "danger"
@@ -184,7 +181,6 @@ def init_app(app):
                 )
 
             else:
-
                 usuario = Usuario(
                     nome=nome,
                     nickname=nickname,
@@ -206,9 +202,7 @@ def init_app(app):
                     )
 
                 else:
-
                     session.clear()
-
                     session["usuario_id"] = usuario.id
                     session["usuario_nome"] = usuario.nome
 
@@ -237,7 +231,6 @@ def init_app(app):
             ).strip()
 
             if not identificador:
-
                 identificador = request.form.get(
                     "email",
                     request.form.get("nickname", "")
@@ -258,7 +251,6 @@ def init_app(app):
             ):
 
                 session.clear()
-
                 session["usuario_id"] = usuario.id
                 session["usuario_nome"] = usuario.nome
 
@@ -289,7 +281,6 @@ def init_app(app):
     # SAIR
     @app.route("/logout", methods=["GET", "POST"])
     def logout():
-
         session.clear()
 
         flash(
@@ -306,7 +297,6 @@ def init_app(app):
         usuario = obter_usuario_atual()
 
         if usuario is None:
-
             flash(
                 "Inicie sessão para aceder ao perfil.",
                 "warning"
@@ -327,12 +317,10 @@ def init_app(app):
             ).strip()
 
             if not nome:
-
                 flash(
                     "O nome não pode ficar vazio.",
                     "warning"
                 )
-
                 return redirect(url_for("perfil"))
 
             usuario.nome = nome
@@ -358,24 +346,19 @@ def init_app(app):
             foto = request.files.get("foto_perfil")
 
             if foto and foto.filename:
-
                 try:
                     usuario.foto_perfil = guardar_imagem(
                         foto,
                         "perfil"
                     )
-
                 except ValueError as exc:
-
                     flash(str(exc), "danger")
-
                     return redirect(url_for("perfil"))
 
             try:
                 db.session.commit()
 
             except IntegrityError:
-
                 db.session.rollback()
 
                 flash(
@@ -384,7 +367,6 @@ def init_app(app):
                 )
 
             else:
-
                 session["usuario_nome"] = usuario.nome
 
                 flash(
@@ -421,14 +403,12 @@ def init_app(app):
     @app.route("/casas")
     @app.route("/doze-casas")
     def casas():
-
         return render_template("casas.html")
 
     # PERSONAGENS
     @app.route("/personagens")
     @app.route("/cavaleiros")
     def personagens():
-
         return redirect(url_for("enciclopedia"))
 
     # PERFIL INDIVIDUAL DO CAVALEIRO
@@ -447,7 +427,6 @@ def init_app(app):
         if cavaleiro is None:
             abort(404)
 
-        # PUBLICAÇÕES DO CAVALEIRO
         publicacoes = PublicacaoCavaleiro.query.filter_by(
             cavaleiro_id=cavaleiro.id
         ).order_by(
@@ -466,13 +445,11 @@ def init_app(app):
     @app.route("/feed")
     def feed():
 
-        # PUBLICAÇÕES DOS CAVALEIROS
         publicacoes = PublicacaoCavaleiro.query.order_by(
             PublicacaoCavaleiro.data.desc(),
             PublicacaoCavaleiro.id.desc()
         ).all()
 
-        # PUBLICAÇÕES DOS USUÁRIOS
         publicacoes_usuarios = Imagem.query.order_by(
             Imagem.data.desc(),
             Imagem.id.desc()
@@ -494,7 +471,6 @@ def init_app(app):
         if request.method == "POST":
 
             if usuario is None:
-
                 flash(
                     "Inicie sessão para publicar uma imagem.",
                     "warning"
@@ -518,21 +494,18 @@ def init_app(app):
             ).strip()
 
             if upload is None or not upload.filename:
-
                 flash(
                     "Selecione uma imagem para publicar.",
                     "warning"
                 )
 
             elif len(legenda) > 500:
-
                 flash(
                     "A legenda não pode exceder 500 caracteres.",
                     "warning"
                 )
 
             else:
-
                 try:
                     filename = guardar_imagem(
                         upload,
@@ -540,11 +513,9 @@ def init_app(app):
                     )
 
                 except ValueError as exc:
-
                     flash(str(exc), "danger")
 
                 else:
-
                     imagem = Imagem(
                         filename=filename,
                         legenda=legenda or None,
@@ -557,7 +528,6 @@ def init_app(app):
                         db.session.commit()
 
                     except IntegrityError:
-
                         db.session.rollback()
 
                         caminho = os.path.join(
@@ -574,7 +544,6 @@ def init_app(app):
                         )
 
                     else:
-
                         flash(
                             "Imagem publicada na galeria.",
                             "success"
@@ -600,7 +569,6 @@ def init_app(app):
         usuario = obter_usuario_atual()
 
         if usuario is None:
-
             flash(
                 "Inicie sessão para excluir uma publicação.",
                 "warning"
@@ -613,10 +581,7 @@ def init_app(app):
                 )
             )
 
-        imagem = db.session.get(
-            Imagem,
-            id
-        )
+        imagem = db.session.get(Imagem, id)
 
         if imagem is None:
             abort(404)
@@ -636,10 +601,7 @@ def init_app(app):
             )
         )
 
-        caminho = os.path.join(
-            pasta,
-            filename
-        )
+        caminho = os.path.join(pasta, filename)
 
         db.session.delete(imagem)
         db.session.commit()
@@ -673,7 +635,6 @@ def init_app(app):
     def chat_page():
 
         if obter_usuario_atual() is None:
-
             flash(
                 "Inicie sessão para entrar no chat.",
                 "warning"
@@ -691,7 +652,159 @@ def init_app(app):
     # QUIZ
     @app.route("/quiz", methods=["GET", "POST"])
     def quiz_alias():
-
         return redirect(
             url_for("desafios.desafios")
+        )
+
+    # CARROSSEL DE MEMÓRIAS
+    @app.route("/memorias")
+    def memorias():
+
+        publicacoes = PublicacaoCavaleiro.query.order_by(
+            PublicacaoCavaleiro.data.desc(),
+            PublicacaoCavaleiro.id.desc()
+        ).all()
+
+        cavaleiros = Cavaleiro.query.order_by(
+            Cavaleiro.nome.asc()
+        ).all()
+
+        return render_template(
+            "memorias.html",
+            publicacoes=publicacoes,
+            cavaleiros=cavaleiros,
+            usuario=obter_usuario_atual()
+        )
+
+    # PUBLICAR MEMÓRIA - EXCLUSIVO DO MESTRE
+    @app.route(
+        "/mestre/publicar-memoria",
+        methods=["GET", "POST"]
+    )
+    def publicar_memoria():
+
+        usuario = obter_usuario_atual()
+
+        if usuario is None:
+            flash(
+                "Inicie sessão para acessar esta página.",
+                "warning"
+            )
+
+            return redirect(
+                url_for(
+                    "login",
+                    next=url_for("publicar_memoria")
+                )
+            )
+
+        if not usuario_e_mestre(usuario):
+            abort(403)
+
+        cavaleiros = Cavaleiro.query.order_by(
+            Cavaleiro.nome.asc()
+        ).all()
+
+        if request.method == "POST":
+
+            cavaleiro_id = request.form.get(
+                "cavaleiro_id",
+                type=int
+            )
+
+            legenda = request.form.get(
+                "legenda",
+                ""
+            ).strip()
+
+            upload = request.files.get("imagem")
+
+            cavaleiro = db.session.get(
+                Cavaleiro,
+                cavaleiro_id
+            ) if cavaleiro_id else None
+
+            if cavaleiro is None:
+                flash(
+                    "Selecione um Cavaleiro válido.",
+                    "warning"
+                )
+
+                return redirect(url_for("publicar_memoria"))
+
+            if not legenda:
+                flash(
+                    "Escreva uma legenda para a memória.",
+                    "warning"
+                )
+
+                return redirect(url_for("publicar_memoria"))
+
+            if len(legenda) > 500:
+                flash(
+                    "A legenda não pode ultrapassar 500 caracteres.",
+                    "warning"
+                )
+
+                return redirect(url_for("publicar_memoria"))
+
+            if upload is None or not upload.filename:
+                flash(
+                    "Selecione uma imagem.",
+                    "warning"
+                )
+
+                return redirect(url_for("publicar_memoria"))
+
+            try:
+                filename = guardar_imagem(
+                    upload,
+                    "memoria"
+                )
+
+            except ValueError as exc:
+                flash(str(exc), "danger")
+
+                return redirect(url_for("publicar_memoria"))
+
+            publicacao = PublicacaoCavaleiro(
+                cavaleiro_id=cavaleiro.id,
+                legenda=legenda,
+                imagem=filename
+            )
+
+            db.session.add(publicacao)
+
+            try:
+                db.session.commit()
+
+            except IntegrityError:
+                db.session.rollback()
+
+                caminho = os.path.join(
+                    current_app.config["UPLOAD_FOLDER"],
+                    filename
+                )
+
+                if os.path.isfile(caminho):
+                    os.remove(caminho)
+
+                flash(
+                    "Não foi possível publicar a memória.",
+                    "danger"
+                )
+
+                return redirect(url_for("publicar_memoria"))
+
+            flash(
+                "Memória publicada no Santuário!",
+                "success"
+            )
+
+            return redirect(url_for("memorias"))
+
+        return render_template(
+            "publicar_memoria.html",
+            cavaleiros=cavaleiros,
+            usuario=usuario
         )

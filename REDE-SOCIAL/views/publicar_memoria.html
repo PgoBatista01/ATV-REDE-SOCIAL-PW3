@@ -1,0 +1,109 @@
+
+{% extends "base.html" %}
+
+{% block title %}Publicar Memória | Santuário de Atena{% endblock %}
+
+{% block content %}
+
+<section class="container py-5">
+
+    <div class="text-center mb-5">
+        <h1>Publicar uma Memória</h1>
+        <p>
+            Compartilhe lembranças da infância dos Cavaleiros
+            com todos os visitantes do Santuário.
+        </p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+
+                    <form method="POST"
+                          action="{{ url_for('publicar_memoria') }}"
+                          enctype="multipart/form-data">
+
+                        <!-- CAVALEIRO -->
+                        <div class="mb-3">
+                            <label for="cavaleiro_id" class="form-label">
+                                Escolha o Cavaleiro
+                            </label>
+
+                            <select
+                                name="cavaleiro_id"
+                                id="cavaleiro_id"
+                                class="form-select"
+                                required>
+
+                                <option value="">Selecione um Cavaleiro</option>
+
+                                {% for cavaleiro in cavaleiros %}
+                                <option value="{{ cavaleiro.id }}">
+                                    {{ cavaleiro.nome }}
+                                </option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+
+                        <!-- LEGENDA -->
+                        <div class="mb-3">
+                            <label for="legenda" class="form-label">
+                                Legenda da memória
+                            </label>
+
+                            <textarea
+                                name="legenda"
+                                id="legenda"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Escreva uma descrição para esta memória..."
+                                required></textarea>
+                        </div>
+
+                        <!-- IMAGEM -->
+                        <div class="mb-4">
+                            <label for="imagem" class="form-label">
+                                Imagem do Cavaleiro
+                            </label>
+
+                            <input
+                                type="file"
+                                name="imagem"
+                                id="imagem"
+                                class="form-control"
+                                accept=".png,.jpg,.jpeg,.gif,.webp"
+                                required>
+
+                            <small class="text-muted">
+                                Formatos permitidos: PNG, JPG, JPEG, GIF e WEBP.
+                            </small>
+                        </div>
+
+                        <!-- BOTÕES -->
+                        <div class="d-flex gap-2">
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                Publicar memória
+                            </button>
+
+                            <a href="{{ url_for('memorias') }}"
+                               class="btn btn-outline-secondary w-100">
+                                Cancelar
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

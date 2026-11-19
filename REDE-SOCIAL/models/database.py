@@ -1,12 +1,15 @@
 
 from flask_sqlalchemy import SQLAlchemy
 
+
 # INICIALIZANDO O SQLALCHEMY
 db = SQLAlchemy()
 
 
 # TABELA DE CAVALEIROS
 class Cavaleiro(db.Model):
+
+    __tablename__ = "cavaleiro"
 
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(150), nullable=False)
@@ -17,8 +20,16 @@ class Cavaleiro(db.Model):
     descricao = db.Column(db.Text)
     imagem = db.Column(db.String(255))
 
-    def __init__(self, nome, constelacao, categoria, armadura,
-                 poder, descricao, imagem=None):
+    def __init__(
+        self,
+        nome,
+        constelacao=None,
+        categoria=None,
+        armadura=None,
+        poder=None,
+        descricao=None,
+        imagem=None
+    ):
 
         self.nome = nome
         self.constelacao = constelacao
@@ -43,6 +54,7 @@ class PublicacaoCavaleiro(db.Model):
     )
 
     legenda = db.Column(db.Text, nullable=False)
+
     imagem = db.Column(db.String(255))
 
     data = db.Column(
@@ -59,7 +71,12 @@ class PublicacaoCavaleiro(db.Model):
         )
     )
 
-    def __init__(self, cavaleiro_id, legenda, imagem=None):
+    def __init__(
+        self,
+        cavaleiro_id,
+        legenda,
+        imagem=None
+    ):
 
         self.cavaleiro_id = cavaleiro_id
         self.legenda = legenda
@@ -68,6 +85,8 @@ class PublicacaoCavaleiro(db.Model):
 
 # TABELA DE CURIOSIDADES
 class Curiosidade(db.Model):
+
+    __tablename__ = "curiosidade"
 
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(150), nullable=False)
@@ -82,7 +101,10 @@ class Curiosidade(db.Model):
 # TABELA DE USUÁRIOS
 class Usuario(db.Model):
 
+    __tablename__ = "usuario"
+
     id = db.Column(db.Integer, primary_key=True)
+
     nome = db.Column(db.String(100), nullable=False)
     nickname = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -95,19 +117,42 @@ class Usuario(db.Model):
 
     pontos = db.Column(db.Integer, default=0)
 
-    def __init__(self, nome, nickname, email, senha):
+    # TIPO DE USUÁRIO
+    tipo_usuario = db.Column(
+        db.String(30),
+        nullable=False,
+        default="usuario"
+    )
+
+    def __init__(
+        self,
+        nome,
+        nickname,
+        email,
+        senha,
+        tipo_usuario="usuario"
+    ):
 
         self.nome = nome
         self.nickname = nickname
         self.email = email
         self.senha = senha
+        self.tipo_usuario = tipo_usuario
 
 
 # TABELA DE IMAGENS DOS USUÁRIOS
 class Imagem(db.Model):
 
+    __tablename__ = "imagem"
+
     id = db.Column(db.Integer, primary_key=True)
-    filename = db.Column(db.String(255), unique=True, nullable=False)
+
+    filename = db.Column(
+        db.String(255),
+        unique=True,
+        nullable=False
+    )
+
     legenda = db.Column(db.Text)
 
     data = db.Column(
@@ -122,10 +167,18 @@ class Imagem(db.Model):
 
     usuario = db.relationship(
         "Usuario",
-        backref=db.backref("imagens", lazy=True)
+        backref=db.backref(
+            "imagens",
+            lazy=True
+        )
     )
 
-    def __init__(self, filename, legenda=None, usuario_id=None):
+    def __init__(
+        self,
+        filename,
+        legenda=None,
+        usuario_id=None
+    ):
 
         self.filename = filename
         self.legenda = legenda
