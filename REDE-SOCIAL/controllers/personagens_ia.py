@@ -80,7 +80,7 @@ def enviar_mensagem(slug):
     )}]
     mensagens.extend(historico[-12:])
     mensagens.append({"role":"user","content":mensagem})
-    endpoint = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1/chat/completions").rstrip("/")
+    endpoint = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
     payload = {"model":os.environ.get("OPENAI_MODEL","gpt-4o-mini"),"messages":mensagens,"temperature":0.85,"max_tokens":500}
     req = Request(endpoint + "/chat/completions", data=json.dumps(payload).encode("utf-8"),
                   headers={"Authorization":"Bearer " + api_key,"Content-Type":"application/json"}, method="POST")
